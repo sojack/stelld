@@ -12,7 +12,7 @@ interface CanvasFieldProps {
 }
 
 function FieldPreview({ field }: { field: FormField }) {
-  const baseClass = "w-full border rounded px-3 py-2 bg-gray-50 text-sm text-gray-400 pointer-events-none";
+  const baseClass = "w-full border rounded px-3 py-2 bg-gray-50 text-sm text-gray-500 pointer-events-none";
 
   if (field.type === "comment") {
     return <textarea className={`${baseClass} h-20 resize-none`} placeholder={field.placeholder || "Long text answer"} readOnly />;
@@ -31,7 +31,7 @@ function FieldPreview({ field }: { field: FormField }) {
     return (
       <div className="space-y-1">
         {(field.choices ?? []).map((choice, i) => (
-          <label key={i} className="flex items-center gap-2 text-sm text-gray-500 pointer-events-none">
+          <label key={i} className="flex items-center gap-2 text-sm text-gray-700 pointer-events-none">
             <input type={inputType} disabled className="pointer-events-none" />
             {choice}
           </label>
@@ -89,7 +89,7 @@ export function CanvasField({ field, isSelected, onSelect, onDelete }: CanvasFie
             >
               ⠿
             </span>
-            <span className="text-sm font-medium">{field.title}</span>
+            <span className="text-sm font-medium text-gray-900">{field.title}</span>
             {field.isRequired && <span className="text-red-500 text-sm">*</span>}
           </div>
           <FieldPreview field={field} />

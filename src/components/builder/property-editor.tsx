@@ -42,32 +42,32 @@ export function PropertyEditor({ field, onChange }: PropertyEditorProps) {
 
   return (
     <div className="space-y-4">
-      <h3 className="text-xs font-semibold text-gray-400 uppercase">Properties</h3>
+      <h3 className="text-xs font-semibold text-gray-500 uppercase">Properties</h3>
 
       {/* Label */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Label</label>
+        <label className="block text-sm font-medium text-gray-900 mb-1">Label</label>
         <input
           ref={labelRef}
           type="text"
           value={field.title}
           onChange={(e) => onChange({ title: e.target.value })}
           onFocus={(e) => e.target.select()}
-          className="w-full border rounded px-3 py-1.5 text-sm"
+          className="w-full border rounded px-3 py-1.5 text-sm text-gray-900"
         />
       </div>
 
       {/* Field Name */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Field name</label>
+        <label className="block text-sm font-medium text-gray-900 mb-1">Field name</label>
         <input
           type="text"
           value={field.name}
           onChange={(e) => onChange({ name: e.target.value.replace(/\s/g, "_") })}
           onFocus={(e) => e.target.select()}
-          className="w-full border rounded px-3 py-1.5 text-sm font-mono"
+          className="w-full border rounded px-3 py-1.5 text-sm font-mono text-gray-900"
         />
-        <p className="text-xs text-gray-400 mt-0.5">Used in submissions data</p>
+        <p className="text-xs text-gray-500 mt-0.5">Used in submissions data</p>
       </div>
 
       {/* Required */}
@@ -85,12 +85,12 @@ export function PropertyEditor({ field, onChange }: PropertyEditorProps) {
       {/* Placeholder */}
       {hasPlaceholder && (
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Placeholder</label>
+          <label className="block text-sm font-medium text-gray-900 mb-1">Placeholder</label>
           <input
             type="text"
             value={field.placeholder ?? ""}
             onChange={(e) => onChange({ placeholder: e.target.value })}
-            className="w-full border rounded px-3 py-1.5 text-sm"
+            className="w-full border rounded px-3 py-1.5 text-sm text-gray-900"
           />
         </div>
       )}
@@ -99,21 +99,21 @@ export function PropertyEditor({ field, onChange }: PropertyEditorProps) {
       {isNumber && (
         <div className="flex gap-2">
           <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Min</label>
+            <label className="block text-sm font-medium text-gray-900 mb-1">Min</label>
             <input
               type="number"
               value={field.min ?? ""}
               onChange={(e) => onChange({ min: e.target.value ? Number(e.target.value) : undefined })}
-              className="w-full border rounded px-3 py-1.5 text-sm"
+              className="w-full border rounded px-3 py-1.5 text-sm text-gray-900"
             />
           </div>
           <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Max</label>
+            <label className="block text-sm font-medium text-gray-900 mb-1">Max</label>
             <input
               type="number"
               value={field.max ?? ""}
               onChange={(e) => onChange({ max: e.target.value ? Number(e.target.value) : undefined })}
-              className="w-full border rounded px-3 py-1.5 text-sm"
+              className="w-full border rounded px-3 py-1.5 text-sm text-gray-900"
             />
           </div>
         </div>
@@ -122,7 +122,7 @@ export function PropertyEditor({ field, onChange }: PropertyEditorProps) {
       {/* Choices */}
       {hasChoices && (
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Options</label>
+          <label className="block text-sm font-medium text-gray-900 mb-1">Options</label>
           <div className="space-y-1.5">
             {(field.choices ?? []).map((choice, i) => (
               <div key={i} className="flex items-center gap-1">
@@ -131,7 +131,7 @@ export function PropertyEditor({ field, onChange }: PropertyEditorProps) {
                   value={choice}
                   onChange={(e) => updateChoice(i, e.target.value)}
                   onFocus={(e) => e.target.select()}
-                  className="flex-1 border rounded px-2 py-1 text-sm"
+                  className="flex-1 border rounded px-2 py-1 text-sm text-gray-900"
                 />
                 <button
                   onClick={() => removeChoice(i)}
