@@ -130,6 +130,7 @@ export function PropertyEditor({ field, onChange }: PropertyEditorProps) {
                   type="text"
                   value={choice}
                   onChange={(e) => updateChoice(i, e.target.value)}
+                  onFocus={(e) => e.target.select()}
                   className="flex-1 border rounded px-2 py-1 text-sm"
                 />
                 <button
