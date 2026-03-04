@@ -49,7 +49,7 @@ function PaletteItem({ type, onAdd }: { type: FieldType; onAdd: () => void }) {
         isDragging ? "opacity-50" : ""
       }`}
     >
-      <span className="w-6 text-center text-gray-400 font-mono text-xs">{type.icon}</span>
+      <span className="w-6 text-center text-gray-500 font-mono text-xs">{type.icon}</span>
       <span>{type.label}</span>
     </button>
   );

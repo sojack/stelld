@@ -205,7 +205,7 @@ export function FormBuilder({ formId, initialSchema, initialTitle, isPublished }
         <div className="flex-1 flex overflow-hidden">
           {/* Left: Field Palette */}
           <div className="w-[200px] bg-white border-r p-3 overflow-y-auto">
-            <h3 className="text-xs font-semibold text-gray-400 uppercase mb-2">Fields</h3>
+            <h3 className="text-xs font-semibold text-gray-500 uppercase mb-2">Fields</h3>
             <FieldPalette onAddField={addField} />
           </div>
 
@@ -251,7 +251,7 @@ export function FormBuilder({ formId, initialSchema, initialTitle, isPublished }
                 onChange={(updates) => updateField(selectedField._id, updates)}
               />
             ) : (
-              <div className="text-sm text-gray-400 text-center pt-8">
+              <div className="text-sm text-gray-500 text-center pt-8">
                 Select a field to edit its properties
               </div>
             )}
