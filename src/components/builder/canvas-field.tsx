@@ -58,7 +58,7 @@ export function CanvasField({ field, isSelected, onSelect, onDelete }: CanvasFie
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: field.name });
+  } = useSortable({ id: field._id });
 
   const style = {
     transform: CSS.Transform.toString(transform),

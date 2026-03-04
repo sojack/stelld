@@ -30,13 +30,15 @@ interface FormBuilderProps {
 }
 
 function parseSchema(schema: object): FormField[] {
-  const s = schema as { pages?: { elements?: FormField[] }[] };
-  return s?.pages?.[0]?.elements ?? [];
+  const s = schema as { pages?: { elements?: Omit<FormField, "_id">[] }[] };
+  const elements = s?.pages?.[0]?.elements ?? [];
+  return elements.map((el) => ({ ...el, _id: uuid() }));
 }
 
 function toSurveyJson(fields: FormField[]): object {
   if (fields.length === 0) return {};
-  return { pages: [{ elements: fields }] };
+  const elements = fields.map(({ _id, ...rest }) => rest);
+  return { pages: [{ elements }] };
 }
 
 export function FormBuilder({ formId, initialSchema, initialTitle, isPublished }: FormBuilderProps) {
@@ -54,7 +56,7 @@ export function FormBuilder({ formId, initialSchema, initialTitle, isPublished }
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
   );
 
-  const selectedField = fields.find((f) => f.name === selectedId) ?? null;
+  const selectedField = fields.find((f) => f._id === selectedId) ?? null;
 
   // Auto-save on change (debounced 3s)
   const scheduleAutoSave = useCallback((updatedFields: FormField[]) => {
@@ -90,10 +92,11 @@ export function FormBuilder({ formId, initialSchema, initialTitle, isPublished }
   function addField(typeId: FieldTypeId) {
     fieldCounter.current++;
     const fieldType = FIELD_TYPES.find((t) => t.id === typeId)!;
-    const name = `question${fieldCounter.current}`;
+    const id = uuid();
     const newField: FormField = {
+      _id: id,
       type: fieldType.surveyType,
-      name,
+      name: `question${fieldCounter.current}`,
       title: fieldType.label,
       isRequired: false,
       ...(fieldType.inputType && { inputType: fieldType.inputType }),
@@ -101,19 +104,19 @@ export function FormBuilder({ formId, initialSchema, initialTitle, isPublished }
     };
     const newFields = [...fields, newField];
     updateFields(newFields);
-    setSelectedId(name);
+    setSelectedId(id);
   }
 
-  function updateField(name: string, updates: Partial<FormField>) {
+  function updateField(id: string, updates: Partial<FormField>) {
     const newFields = fields.map((f) =>
-      f.name === name ? { ...f, ...updates } : f
+      f._id === id ? { ...f, ...updates } : f
     );
     updateFields(newFields);
   }
 
-  function deleteField(name: string) {
-    const newFields = fields.filter((f) => f.name !== name);
-    if (selectedId === name) setSelectedId(null);
+  function deleteField(id: string) {
+    const newFields = fields.filter((f) => f._id !== id);
+    if (selectedId === id) setSelectedId(null);
     updateFields(newFields);
   }
 
@@ -134,8 +137,8 @@ export function FormBuilder({ formId, initialSchema, initialTitle, isPublished }
 
     // Reordering within canvas
     if (over && active.id !== over.id) {
-      const oldIndex = fields.findIndex((f) => f.name === active.id);
-      const newIndex = fields.findIndex((f) => f.name === over.id);
+      const oldIndex = fields.findIndex((f) => f._id === active.id);
+      const newIndex = fields.findIndex((f) => f._id === over.id);
       if (oldIndex !== -1 && newIndex !== -1) {
         updateFields(arrayMove(fields, oldIndex, newIndex));
       }
@@ -221,17 +224,17 @@ export function FormBuilder({ formId, initialSchema, initialTitle, isPublished }
                 </div>
               ) : (
                 <SortableContext
-                  items={fields.map((f) => f.name)}
+                  items={fields.map((f) => f._id)}
                   strategy={verticalListSortingStrategy}
                 >
                   <div className="space-y-2">
                     {fields.map((field) => (
                       <CanvasField
-                        key={field.name}
+                        key={field._id}
                         field={field}
-                        isSelected={selectedId === field.name}
-                        onSelect={() => setSelectedId(field.name)}
-                        onDelete={() => deleteField(field.name)}
+                        isSelected={selectedId === field._id}
+                        onSelect={() => setSelectedId(field._id)}
+                        onDelete={() => deleteField(field._id)}
                       />
                     ))}
                   </div>
@@ -245,7 +248,7 @@ export function FormBuilder({ formId, initialSchema, initialTitle, isPublished }
             {selectedField ? (
               <PropertyEditor
                 field={selectedField}
-                onChange={(updates) => updateField(selectedField.name, updates)}
+                onChange={(updates) => updateField(selectedField._id, updates)}
               />
             ) : (
               <div className="text-sm text-gray-400 text-center pt-8">
@@ -260,7 +263,7 @@ export function FormBuilder({ formId, initialSchema, initialTitle, isPublished }
             <div className="bg-white border border-blue-300 rounded px-3 py-2 shadow-lg text-sm">
               {activeId.startsWith("palette-")
                 ? FIELD_TYPES.find((t) => t.id === activeId.replace("palette-", ""))?.label
-                : fields.find((f) => f.name === activeId)?.title}
+                : fields.find((f) => f._id === activeId)?.title}
             </div>
           ) : null}
         </DragOverlay>
