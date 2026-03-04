@@ -84,7 +84,7 @@ export function CanvasField({ field, isSelected, onSelect, onDelete }: CanvasFie
             <span
               {...attributes}
               {...listeners}
-              className="cursor-grab text-gray-300 hover:text-gray-500 mr-1"
+              className="cursor-grab text-gray-400 hover:text-gray-700 mr-1.5 text-lg leading-none"
               title="Drag to reorder"
             >
               ⠿
