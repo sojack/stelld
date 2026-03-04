@@ -25,6 +25,7 @@ const THEME_OVERRIDES = {
     "--sjs-general-dim-forecolor-light": "#6b7280",
     "--sjs-border-default": "#9ca3af",
     "--sjs-border-light": "#d1d5db",
+    "--sjs-border-inside": "#9ca3af",
     "--sjs-font-family": "inherit",
     "--sjs-font-size": "16px",
     "--sjs-corner-radius": "6px",
