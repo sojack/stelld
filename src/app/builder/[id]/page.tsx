@@ -1,0 +1,29 @@
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/db";
+import { redirect, notFound } from "next/navigation";
+import { FormBuilder } from "@/components/form-builder";
+
+export default async function BuilderPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const session = await auth();
+  if (!session?.user?.id) redirect("/login");
+
+  const form = await prisma.form.findFirst({
+    where: { id, userId: session.user.id },
+  });
+
+  if (!form) notFound();
+
+  return (
+    <FormBuilder
+      formId={form.id}
+      initialSchema={form.schema as object}
+      initialTitle={form.title}
+      isPublished={form.isPublished}
+    />
+  );
+}
