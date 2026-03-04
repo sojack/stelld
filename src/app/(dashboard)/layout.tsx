@@ -12,22 +12,22 @@ export default async function DashboardLayout({
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white border-b px-6 py-3 flex items-center justify-between">
-        <Link href="/dashboard" className="font-bold text-lg">FormBuilder</Link>
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-gray-600">{session.user.email}</span>
+      <nav className="bg-white border-b px-6 py-4 flex items-center justify-between">
+        <Link href="/dashboard" className="font-bold text-xl text-gray-900">FormBuilder</Link>
+        <div className="flex items-center gap-5">
+          <span className="text-sm font-medium text-gray-700">{session.user.email}</span>
           <form action={async () => {
             "use server";
             const { signOut } = await import("@/lib/auth");
             await signOut({ redirectTo: "/login" });
           }}>
-            <button type="submit" className="text-sm text-gray-500 hover:text-gray-700">
+            <button type="submit" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">
               Log out
             </button>
           </form>
         </div>
       </nav>
-      <main className="max-w-6xl mx-auto p-6">{children}</main>
+      <main className="max-w-6xl mx-auto p-8">{children}</main>
     </div>
   );
 }
