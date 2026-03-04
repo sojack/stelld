@@ -72,11 +72,12 @@ export function PropertyEditor({ field, onChange }: PropertyEditorProps) {
 
       {/* Required */}
       <div>
-        <label className="flex items-center gap-2 text-sm">
+        <label className="flex items-center gap-2 text-sm font-medium text-gray-900 cursor-pointer">
           <input
             type="checkbox"
             checked={field.isRequired}
             onChange={(e) => onChange({ isRequired: e.target.checked })}
+            className="w-4 h-4"
           />
           Required
         </label>
