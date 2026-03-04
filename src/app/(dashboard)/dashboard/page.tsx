@@ -45,22 +45,23 @@ export default function DashboardPage() {
     if (res.ok) fetchForms();
   }
 
-  if (loading) return <div className="py-12 text-center text-gray-500">Loading...</div>;
+  if (loading) return <div className="py-12 text-center text-gray-600 text-lg">Loading...</div>;
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Your Forms</h1>
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">Your Forms</h1>
         <button
           onClick={createForm}
-          className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800"
+          className="bg-black text-white font-medium px-5 py-2.5 rounded-md hover:bg-gray-800 transition-colors"
         >
-          New Form
+          + New Form
         </button>
       </div>
       {forms.length === 0 ? (
-        <div className="text-center py-12 text-gray-500">
-          <p>No forms yet. Create your first one!</p>
+        <div className="text-center py-16 text-gray-500">
+          <p className="text-lg mb-2">No forms yet</p>
+          <p className="text-sm">Create your first form to get started.</p>
         </div>
       ) : (
         <div className="space-y-3">
