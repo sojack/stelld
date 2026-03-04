@@ -45,12 +45,12 @@ function PaletteItem({ type, onAdd }: { type: FieldType; onAdd: () => void }) {
       {...listeners}
       {...attributes}
       onClick={onAdd}
-      className={`w-full flex items-center gap-2 px-3 py-2 text-sm text-left rounded hover:bg-gray-100 transition-colors ${
+      className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-left rounded-md border border-transparent hover:bg-gray-100 hover:border-gray-200 transition-colors ${
         isDragging ? "opacity-50" : ""
       }`}
     >
-      <span className="w-6 text-center text-gray-500 font-mono text-xs">{type.icon}</span>
-      <span>{type.label}</span>
+      <span className="w-7 h-7 flex items-center justify-center rounded bg-gray-100 text-gray-600 font-mono text-xs shrink-0">{type.icon}</span>
+      <span className="text-gray-800 font-medium">{type.label}</span>
     </button>
   );
 }
