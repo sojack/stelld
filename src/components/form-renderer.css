@@ -1,0 +1,30 @@
+/* Override SurveyJS input borders for better visibility */
+.sd-input {
+  border: 1px solid #9ca3af !important;
+}
+
+.sd-input:focus,
+.sd-input--focused {
+  border-color: #16a34a !important;
+  box-shadow: 0 0 0 1px #16a34a !important;
+}
+
+.sd-input--error {
+  border-color: #dc2626 !important;
+}
+
+/* Checkbox and radio borders */
+.sd-checkbox__decorator,
+.sd-radio__decorator {
+  border: 1px solid #9ca3af !important;
+}
+
+.sd-item--allowhover:hover .sd-checkbox__decorator,
+.sd-item--allowhover:hover .sd-radio__decorator {
+  border-color: #16a34a !important;
+}
+
+.sd-checkbox--checked .sd-checkbox__decorator,
+.sd-radio--checked .sd-radio__decorator {
+  border-color: #16a34a !important;
+}

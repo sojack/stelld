@@ -4,6 +4,7 @@ import { useCallback, useState } from "react";
 import { Model } from "survey-core";
 import { Survey } from "survey-react-ui";
 import "survey-core/survey-core.min.css";
+import "./form-renderer.css";
 
 interface FormRendererProps {
   formId: string;
