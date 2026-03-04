@@ -11,6 +11,29 @@ interface FormRendererProps {
   thankYouMessage: string;
 }
 
+const THEME_OVERRIDES = {
+  cssVariables: {
+    "--sjs-primary-backcolor": "#16a34a",
+    "--sjs-primary-backcolor-light": "rgba(22, 163, 74, 0.1)",
+    "--sjs-primary-backcolor-dark": "#15803d",
+    "--sjs-primary-forecolor": "#ffffff",
+    "--sjs-general-backcolor": "#ffffff",
+    "--sjs-general-backcolor-dim": "#f9fafb",
+    "--sjs-general-forecolor": "#111827",
+    "--sjs-general-forecolor-light": "#4b5563",
+    "--sjs-general-dim-forecolor": "#374151",
+    "--sjs-general-dim-forecolor-light": "#6b7280",
+    "--sjs-border-default": "#e5e7eb",
+    "--sjs-border-light": "#f3f4f6",
+    "--sjs-font-family": "inherit",
+    "--sjs-font-size": "16px",
+    "--sjs-corner-radius": "6px",
+    "--sjs-base-unit": "8px",
+    "--sjs-shadow-small": "0 1px 2px 0 rgba(0,0,0,0.05)",
+    "--sjs-shadow-inner": "none",
+  },
+};
+
 export function FormRenderer({ formId, schema, thankYouMessage }: FormRendererProps) {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
@@ -36,9 +59,9 @@ export function FormRenderer({ formId, schema, thankYouMessage }: FormRendererPr
 
   if (submitted) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center p-8">
-          <h2 className="text-2xl font-bold mb-2">Thank you!</h2>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center p-8 bg-white rounded-lg shadow-sm border max-w-md">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Thank you!</h2>
           <p className="text-gray-600">{thankYouMessage}</p>
         </div>
       </div>
@@ -47,17 +70,20 @@ export function FormRenderer({ formId, schema, thankYouMessage }: FormRendererPr
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-red-600">{error}</p>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center p-8 bg-white rounded-lg shadow-sm border max-w-md">
+          <p className="text-red-600 font-medium">{error}</p>
+        </div>
       </div>
     );
   }
 
   const survey = new Model(schema);
+  survey.applyTheme(THEME_OVERRIDES as Parameters<typeof survey.applyTheme>[0]);
   survey.onComplete.add(onComplete);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 py-10">
       {/* Honeypot — hidden from humans, visible to bots */}
       <input
         id="_hp_field"
