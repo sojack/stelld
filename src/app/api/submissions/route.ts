@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import { sendSubmissionNotification } from "@/lib/email";
 import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 
@@ -56,7 +57,15 @@ export async function POST(req: Request) {
     },
   });
 
-  // TODO (Task 11): Send email notification to form.user.email
+  // Send notification (fire-and-forget, don't block the response)
+  if (form.user.email) {
+    sendSubmissionNotification(
+      form.user.email,
+      form.title,
+      form.id,
+      submission.id
+    );
+  }
 
   return NextResponse.json({ success: true }, { status: 201 });
 }

@@ -11,7 +11,9 @@ export async function middleware(req: NextRequest) {
   const isOnDashboard = req.nextUrl.pathname.startsWith("/dashboard") ||
     req.nextUrl.pathname.startsWith("/builder");
   const isOnAuth = req.nextUrl.pathname.startsWith("/login") ||
-    req.nextUrl.pathname.startsWith("/signup");
+    req.nextUrl.pathname.startsWith("/signup") ||
+    req.nextUrl.pathname.startsWith("/forgot-password") ||
+    req.nextUrl.pathname.startsWith("/reset-password");
 
   if (isOnDashboard && !isLoggedIn) {
     return NextResponse.redirect(new URL("/login", req.nextUrl));
@@ -25,5 +27,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/builder/:path*", "/login", "/signup"],
+  matcher: ["/dashboard/:path*", "/builder/:path*", "/login", "/signup", "/forgot-password", "/reset-password"],
 };

@@ -32,20 +32,20 @@ export function SubmissionsTable({ submissions, formSchema }: SubmissionsTablePr
       {/* Detail modal */}
       {selected && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-lg w-full max-h-[80vh] overflow-auto">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="font-bold">Submission Detail</h3>
-              <button onClick={() => setSelected(null)} className="text-gray-400 hover:text-gray-600">&times;</button>
+          <div className="bg-white rounded-lg p-6 max-w-lg w-full max-h-[80vh] overflow-auto shadow-lg">
+            <div className="flex justify-between items-center mb-5">
+              <h3 className="text-lg font-bold text-gray-900">Submission Detail</h3>
+              <button onClick={() => setSelected(null)} className="text-gray-500 hover:text-gray-900 text-xl leading-none">&times;</button>
             </div>
-            <dl className="space-y-3">
+            <dl className="space-y-4">
               {Object.entries(selected.data).map(([key, value]) => (
                 <div key={key}>
-                  <dt className="text-sm font-medium text-gray-500">{key}</dt>
-                  <dd className="mt-1">{String(value)}</dd>
+                  <dt className="text-sm font-semibold text-gray-700">{key}</dt>
+                  <dd className="mt-1 text-gray-900">{String(value)}</dd>
                 </div>
               ))}
             </dl>
-            <p className="mt-4 text-xs text-gray-400">
+            <p className="mt-5 text-sm text-gray-600">
               Submitted {new Date(selected.createdAt).toLocaleString()}
             </p>
           </div>
@@ -53,32 +53,32 @@ export function SubmissionsTable({ submissions, formSchema }: SubmissionsTablePr
       )}
 
       {/* Table */}
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto bg-white border rounded-lg">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b">
-              <th className="text-left py-2 px-3 font-medium text-gray-500">Date</th>
+            <tr className="border-b bg-gray-50">
+              <th className="text-left py-3 px-4 font-semibold text-gray-700">Date</th>
               {columns.slice(0, 5).map((col) => (
-                <th key={col} className="text-left py-2 px-3 font-medium text-gray-500">{col}</th>
+                <th key={col} className="text-left py-3 px-4 font-semibold text-gray-700">{col}</th>
               ))}
-              <th className="py-2 px-3"></th>
+              <th className="py-3 px-4"></th>
             </tr>
           </thead>
           <tbody>
             {submissions.map((sub) => (
-              <tr key={sub.id} className="border-b hover:bg-gray-50">
-                <td className="py-2 px-3 text-gray-500">
+              <tr key={sub.id} className="border-b last:border-b-0 hover:bg-gray-50 transition-colors">
+                <td className="py-3 px-4 text-gray-600 font-medium">
                   {new Date(sub.createdAt).toLocaleDateString()}
                 </td>
                 {columns.slice(0, 5).map((col) => (
-                  <td key={col} className="py-2 px-3 max-w-[200px] truncate">
+                  <td key={col} className="py-3 px-4 text-gray-900 max-w-[200px] truncate">
                     {String(sub.data[col] ?? "")}
                   </td>
                 ))}
-                <td className="py-2 px-3">
+                <td className="py-3 px-4">
                   <button
                     onClick={() => setSelected(sub)}
-                    className="text-blue-600 hover:underline"
+                    className="text-sm font-medium text-green-700 hover:text-green-900 hover:underline transition-colors"
                   >
                     View
                   </button>

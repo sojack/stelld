@@ -90,13 +90,15 @@ export function FormRenderer({ formId, schema, thankYouMessage }: FormRendererPr
     function handleFocusIn(e: FocusEvent) {
       const target = e.target as HTMLElement;
       if (
-        target instanceof HTMLInputElement &&
-        (target.type === "text" || target.type === "email" || target.type === "tel" ||
-         target.type === "number" || target.type === "date" || target.type === "url")
+        (target instanceof HTMLInputElement &&
+          (target.type === "text" || target.type === "email" || target.type === "tel" ||
+           target.type === "number" || target.type === "date" || target.type === "url")) ||
+        target instanceof HTMLTextAreaElement
       ) {
-        target.select();
-      } else if (target instanceof HTMLTextAreaElement) {
-        target.select();
+        // Delay to let SurveyJS finish its focus handling so selection is visible
+        setTimeout(() => {
+          (target as HTMLInputElement | HTMLTextAreaElement).select();
+        }, 50);
       }
     }
 

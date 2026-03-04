@@ -44,22 +44,22 @@ export default function FormSubmissionsPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-8">
         <div>
-          <Link href="/dashboard" className="text-sm text-gray-500 hover:text-gray-700">&larr; All forms</Link>
-          <h1 className="text-2xl font-bold mt-1">{form.title}</h1>
-          <p className="text-sm text-gray-500">{submissions.length} submissions</p>
+          <Link href="/dashboard" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">&larr; All forms</Link>
+          <h1 className="text-3xl font-bold text-gray-900 mt-1">{form.title}</h1>
+          <p className="text-sm font-medium text-gray-600 mt-1">{submissions.length} submission{submissions.length !== 1 ? "s" : ""}</p>
         </div>
         <div className="flex gap-2">
           <Link
             href={`/builder/${formId}`}
-            className="text-sm px-4 py-2 border rounded hover:bg-gray-50"
+            className="text-sm font-medium px-4 py-2 border rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
           >
             Edit form
           </Link>
           <a
             href={`/api/forms/${formId}/submissions/export`}
-            className="text-sm px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
+            className="text-sm font-medium px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition-colors"
           >
             Export CSV
           </a>

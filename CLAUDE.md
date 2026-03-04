@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Canadian-first form builder SaaS — a lean alternative to JotForm that stores all data in Canada. Initial target is Canadian small businesses; government/enterprise comes later.
+**Stelld** — a Canadian-first form builder SaaS. Lean alternative to JotForm that stores all data in Canada. Initial target is Canadian small businesses; government/enterprise comes later.
+
+Name inspired by Shakespeare's Sonnet 24: "stell'd / Thy beauty's form in table of my heart."
 
 See `docs/plans/2026-03-03-mvp-design.md` for the full approved design.
 
