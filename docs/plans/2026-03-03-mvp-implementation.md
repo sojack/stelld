@@ -47,9 +47,9 @@ services:
     image: postgres:16
     restart: unless-stopped
     environment:
-      POSTGRES_USER: formbuilder
+      POSTGRES_USER: stelld
       POSTGRES_PASSWORD: localdev
-      POSTGRES_DB: formbuilder
+      POSTGRES_DB: stelld
     ports:
       - "5432:5432"
     volumes:
@@ -63,7 +63,7 @@ volumes:
 
 ```bash
 # Database
-DATABASE_URL="postgresql://formbuilder:localdev@localhost:5432/formbuilder"
+DATABASE_URL="postgresql://stelld:localdev@localhost:5432/stelld"
 
 # Auth.js
 AUTH_SECRET="generate-with-npx-auth-secret"
@@ -73,7 +73,7 @@ AUTH_URL="http://localhost:3000"
 AWS_REGION="ca-central-1"
 AWS_ACCESS_KEY_ID=""
 AWS_SECRET_ACCESS_KEY=""
-SES_FROM_EMAIL="noreply@yourapp.ca"
+SES_FROM_EMAIL="noreply@stelld.ca"
 
 # App
 NEXT_PUBLIC_APP_URL="http://localhost:3000"
@@ -479,31 +479,38 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="w-full max-w-md p-8">
-        <h1 className="text-2xl font-bold mb-6">Create an account</h1>
-        {error && <p className="text-red-600 mb-4">{error}</p>}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium mb-1">Name</label>
-            <input id="name" name="name" type="text" className="w-full border rounded px-3 py-2" />
+    <div className="min-h-screen flex flex-col">
+      <div className="flex-1 flex items-center justify-center">
+        <div className="w-full max-w-md p-8">
+          <div className="text-center mb-8">
+            <h1 className="text-2xl font-bold">Stelld</h1>
+            <p className="text-sm text-gray-500">Forms built in Canada</p>
           </div>
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium mb-1">Email</label>
-            <input id="email" name="email" type="email" required className="w-full border rounded px-3 py-2" />
-          </div>
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium mb-1">Password</label>
-            <input id="password" name="password" type="password" required minLength={8} className="w-full border rounded px-3 py-2" />
-          </div>
-          <button type="submit" disabled={loading} className="w-full bg-black text-white py-2 rounded hover:bg-gray-800 disabled:opacity-50">
-            {loading ? "Creating account..." : "Sign up"}
-          </button>
-        </form>
-        <p className="mt-4 text-sm text-center">
-          Already have an account? <Link href="/login" className="underline">Log in</Link>
-        </p>
+          <h2 className="text-xl font-semibold mb-6">Create an account</h2>
+          {error && <p className="text-red-600 mb-4">{error}</p>}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium mb-1">Name</label>
+              <input id="name" name="name" type="text" className="w-full border rounded px-3 py-2" />
+            </div>
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium mb-1">Email</label>
+              <input id="email" name="email" type="email" required className="w-full border rounded px-3 py-2" />
+            </div>
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium mb-1">Password</label>
+              <input id="password" name="password" type="password" required minLength={8} className="w-full border rounded px-3 py-2" />
+            </div>
+            <button type="submit" disabled={loading} className="w-full bg-black text-white py-2 rounded hover:bg-gray-800 disabled:opacity-50">
+              {loading ? "Creating account..." : "Sign up"}
+            </button>
+          </form>
+          <p className="mt-4 text-sm text-center">
+            Already have an account? <Link href="/login" className="underline">Log in</Link>
+          </p>
+        </div>
       </div>
+      <footer className="py-4 text-center text-xs text-gray-400">Stelld &mdash; Forms built in Canada</footer>
     </div>
   );
 }
@@ -547,27 +554,34 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="w-full max-w-md p-8">
-        <h1 className="text-2xl font-bold mb-6">Log in</h1>
-        {error && <p className="text-red-600 mb-4">{error}</p>}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium mb-1">Email</label>
-            <input id="email" name="email" type="email" required className="w-full border rounded px-3 py-2" />
+    <div className="min-h-screen flex flex-col">
+      <div className="flex-1 flex items-center justify-center">
+        <div className="w-full max-w-md p-8">
+          <div className="text-center mb-8">
+            <h1 className="text-2xl font-bold">Stelld</h1>
+            <p className="text-sm text-gray-500">Forms built in Canada</p>
           </div>
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium mb-1">Password</label>
-            <input id="password" name="password" type="password" required className="w-full border rounded px-3 py-2" />
-          </div>
-          <button type="submit" disabled={loading} className="w-full bg-black text-white py-2 rounded hover:bg-gray-800 disabled:opacity-50">
-            {loading ? "Logging in..." : "Log in"}
-          </button>
-        </form>
-        <p className="mt-4 text-sm text-center">
-          Don&apos;t have an account? <Link href="/signup" className="underline">Sign up</Link>
-        </p>
+          <h2 className="text-xl font-semibold mb-6">Log in</h2>
+          {error && <p className="text-red-600 mb-4">{error}</p>}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium mb-1">Email</label>
+              <input id="email" name="email" type="email" required className="w-full border rounded px-3 py-2" />
+            </div>
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium mb-1">Password</label>
+              <input id="password" name="password" type="password" required className="w-full border rounded px-3 py-2" />
+            </div>
+            <button type="submit" disabled={loading} className="w-full bg-black text-white py-2 rounded hover:bg-gray-800 disabled:opacity-50">
+              {loading ? "Logging in..." : "Log in"}
+            </button>
+          </form>
+          <p className="mt-4 text-sm text-center">
+            Don&apos;t have an account? <Link href="/signup" className="underline">Sign up</Link>
+          </p>
+        </div>
       </div>
+      <footer className="py-4 text-center text-xs text-gray-400">Stelld &mdash; Forms built in Canada</footer>
     </div>
   );
 }
@@ -616,7 +630,7 @@ export default async function DashboardLayout({
   return (
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-white border-b px-6 py-3 flex items-center justify-between">
-        <Link href="/dashboard" className="font-bold text-lg">FormBuilder</Link>
+        <Link href="/dashboard" className="font-bold text-lg">Stelld</Link>
         <div className="flex items-center gap-4">
           <span className="text-sm text-gray-600">{session.user.email}</span>
           <form action={async () => {
@@ -1735,7 +1749,7 @@ import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
 
 const ses = new SESClient({ region: process.env.AWS_REGION ?? "ca-central-1" });
 
-const fromEmail = process.env.SES_FROM_EMAIL ?? "noreply@yourapp.ca";
+const fromEmail = process.env.SES_FROM_EMAIL ?? "noreply@stelld.ca";
 
 export async function sendSubmissionNotification(
   toEmail: string,
@@ -1875,8 +1889,8 @@ CMD ["node", "server.js"]
 **Step 3: Test the Docker build**
 
 ```bash
-docker build -t formbuilder .
-docker run -p 3000:3000 --env-file .env.local formbuilder
+docker build -t stelld .
+docker run -p 3000:3000 --env-file .env.local stelld
 ```
 
 Visit http://localhost:3000 — should work.
@@ -1909,21 +1923,28 @@ export default async function HomePage() {
   if (session?.user) redirect("/dashboard");
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">FormBuilder</h1>
-        <p className="text-gray-600 mb-8">
-          Simple form builder. Your data stays in Canada.
-        </p>
-        <div className="flex gap-4 justify-center">
-          <Link href="/signup" className="bg-black text-white px-6 py-2 rounded hover:bg-gray-800">
-            Get started
-          </Link>
-          <Link href="/login" className="border px-6 py-2 rounded hover:bg-gray-50">
-            Log in
-          </Link>
+    <div className="min-h-screen flex flex-col">
+      <div className="flex-1 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold mb-2">Stelld</h1>
+          <p className="text-lg text-gray-600 mb-6">
+            Forms built in Canada
+          </p>
+          <blockquote className="text-sm text-gray-400 italic mb-8 max-w-md mx-auto">
+            &ldquo;Mine eye hath play&apos;d the painter and hath stell&apos;d / Thy beauty&apos;s form in table of my heart.&rdquo;
+            <span className="block mt-1 not-italic">&mdash; William Shakespeare, Sonnet 24</span>
+          </blockquote>
+          <div className="flex gap-4 justify-center">
+            <Link href="/signup" className="bg-black text-white px-6 py-2 rounded hover:bg-gray-800">
+              Get started
+            </Link>
+            <Link href="/login" className="border px-6 py-2 rounded hover:bg-gray-50">
+              Log in
+            </Link>
+          </div>
         </div>
       </div>
+      <footer className="py-4 text-center text-xs text-gray-400">Stelld &mdash; Forms built in Canada</footer>
     </div>
   );
 }

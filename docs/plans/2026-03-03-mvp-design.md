@@ -1,4 +1,4 @@
-# MVP Design: Canadian Form Builder SaaS
+# MVP Design: Stelld — Canadian Form Builder SaaS
 
 **Date:** 2026-03-03
 **Status:** Approved
@@ -128,7 +128,7 @@ Auth.js also creates `accounts`, `sessions`, and `verification_tokens` tables au
 - Preview mode
 
 ### Public Form Page
-- Served at `yourapp.ca/f/[form-id]`
+- Served at `stelld.ca/f/[form-id]`
 - 404 if form is draft/unpublished
 - SurveyJS Library renders the form
 - Configurable thank-you message on completion
