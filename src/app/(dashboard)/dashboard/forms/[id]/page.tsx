@@ -1,0 +1,72 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import Link from "next/link";
+import { SubmissionsTable } from "@/components/submissions-table";
+
+interface FormData {
+  id: string;
+  title: string;
+  schema: object;
+  isPublished: boolean;
+}
+
+interface Submission {
+  id: string;
+  data: Record<string, unknown>;
+  metadata: Record<string, unknown>;
+  createdAt: string;
+}
+
+export default function FormSubmissionsPage() {
+  const params = useParams();
+  const formId = params.id as string;
+  const [form, setForm] = useState<FormData | null>(null);
+  const [submissions, setSubmissions] = useState<Submission[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      const res = await fetch(`/api/forms/${formId}/submissions`);
+      if (res.ok) {
+        const data = await res.json();
+        setForm(data.form);
+        setSubmissions(data.submissions);
+      }
+      setLoading(false);
+    }
+    load();
+  }, [formId]);
+
+  if (loading) return <div className="py-12 text-center text-gray-500">Loading...</div>;
+  if (!form) return <div className="py-12 text-center text-gray-500">Form not found.</div>;
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <Link href="/dashboard" className="text-sm text-gray-500 hover:text-gray-700">&larr; All forms</Link>
+          <h1 className="text-2xl font-bold mt-1">{form.title}</h1>
+          <p className="text-sm text-gray-500">{submissions.length} submissions</p>
+        </div>
+        <div className="flex gap-2">
+          <Link
+            href={`/builder/${formId}`}
+            className="text-sm px-4 py-2 border rounded hover:bg-gray-50"
+          >
+            Edit form
+          </Link>
+          <a
+            href={`/api/forms/${formId}/submissions/export`}
+            className="text-sm px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
+          >
+            Export CSV
+          </a>
+        </div>
+      </div>
+
+      <SubmissionsTable submissions={submissions} formSchema={form.schema} />
+    </div>
+  );
+}
