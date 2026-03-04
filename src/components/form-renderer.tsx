@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Model } from "survey-core";
 import { Survey } from "survey-react-ui";
 import "survey-core/survey-core.min.css";
@@ -80,12 +80,36 @@ export function FormRenderer({ formId, schema, thankYouMessage }: FormRendererPr
     );
   }
 
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Auto-select text on focus for all text inputs within the survey
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    function handleFocusIn(e: FocusEvent) {
+      const target = e.target as HTMLElement;
+      if (
+        target instanceof HTMLInputElement &&
+        (target.type === "text" || target.type === "email" || target.type === "tel" ||
+         target.type === "number" || target.type === "date" || target.type === "url")
+      ) {
+        target.select();
+      } else if (target instanceof HTMLTextAreaElement) {
+        target.select();
+      }
+    }
+
+    container.addEventListener("focusin", handleFocusIn);
+    return () => container.removeEventListener("focusin", handleFocusIn);
+  }, []);
+
   const survey = new Model(schema);
   survey.applyTheme(THEME_OVERRIDES as Parameters<typeof survey.applyTheme>[0]);
   survey.onComplete.add(onComplete);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-10">
+    <div ref={containerRef} className="min-h-screen bg-gray-50 py-10">
       {/* Honeypot — hidden from humans, visible to bots */}
       <input
         id="_hp_field"
