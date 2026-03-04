@@ -205,7 +205,7 @@ export function FormBuilder({ formId, initialSchema, initialTitle, isPublished }
         <div className="flex-1 flex overflow-hidden">
           {/* Left: Field Palette */}
           <div className="w-[200px] bg-white border-r p-3 overflow-y-auto">
-            <h3 className="text-xs font-semibold text-gray-500 uppercase mb-2">Fields</h3>
+            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Fields</h3>
             <FieldPalette onAddField={addField} />
           </div>
 
