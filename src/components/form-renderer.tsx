@@ -3,7 +3,7 @@
 import { useCallback, useState } from "react";
 import { Model } from "survey-core";
 import { Survey } from "survey-react-ui";
-import "survey-core/defaultV2.min.css";
+import "survey-core/survey-core.min.css";
 
 interface FormRendererProps {
   formId: string;
