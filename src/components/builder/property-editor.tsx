@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import type { FormField } from "./types";
 
 interface PropertyEditorProps {
@@ -8,6 +9,17 @@ interface PropertyEditorProps {
 }
 
 export function PropertyEditor({ field, onChange }: PropertyEditorProps) {
+  const labelRef = useRef<HTMLInputElement>(null);
+  const prevFieldId = useRef(field._id);
+
+  // Auto-select label text when a new field is selected
+  useEffect(() => {
+    if (field._id !== prevFieldId.current) {
+      prevFieldId.current = field._id;
+      labelRef.current?.focus();
+      labelRef.current?.select();
+    }
+  }, [field._id]);
   const hasChoices = field.type === "dropdown" || field.type === "checkbox" || field.type === "radiogroup";
   const hasPlaceholder = field.type === "text" || field.type === "comment";
   const isNumber = field.inputType === "number";
@@ -36,9 +48,11 @@ export function PropertyEditor({ field, onChange }: PropertyEditorProps) {
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">Label</label>
         <input
+          ref={labelRef}
           type="text"
           value={field.title}
           onChange={(e) => onChange({ title: e.target.value })}
+          onFocus={(e) => e.target.select()}
           className="w-full border rounded px-3 py-1.5 text-sm"
         />
       </div>
@@ -50,6 +64,7 @@ export function PropertyEditor({ field, onChange }: PropertyEditorProps) {
           type="text"
           value={field.name}
           onChange={(e) => onChange({ name: e.target.value.replace(/\s/g, "_") })}
+          onFocus={(e) => e.target.select()}
           className="w-full border rounded px-3 py-1.5 text-sm font-mono"
         />
         <p className="text-xs text-gray-400 mt-0.5">Used in submissions data</p>
