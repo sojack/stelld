@@ -158,35 +158,36 @@ export function FormBuilder({ formId, initialSchema, initialTitle, isPublished }
   return (
     <div className="h-screen flex flex-col">
       {/* Toolbar */}
-      <div className="bg-white border-b px-4 py-2 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <a href="/dashboard" className="text-sm text-gray-500 hover:text-gray-700">&larr; Dashboard</a>
+      <div className="bg-white border-b px-5 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <a href="/dashboard" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">&larr; Dashboard</a>
+          <div className="w-px h-5 bg-gray-200" />
           <input
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             onBlur={() => saveForm()}
-            className="font-medium text-lg border-none outline-none focus:ring-1 focus:ring-gray-300 rounded px-2 py-1"
+            className="font-semibold text-lg text-gray-900 border-none outline-none focus:ring-1 focus:ring-gray-300 rounded px-2 py-1"
           />
         </div>
-        <div className="flex items-center gap-3">
-          <span className="text-xs text-gray-400">
+        <div className="flex items-center gap-4">
+          <span className="text-sm text-gray-500">
             {saving ? "Saving..." : lastSaved ? `Saved ${lastSaved.toLocaleTimeString()}` : ""}
           </span>
           {published && (
             <a
               href={`/f/${formId}`}
               target="_blank"
-              className="text-sm text-blue-600 hover:underline"
+              className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline"
             >
               View live form
             </a>
           )}
           <button
             onClick={togglePublish}
-            className={`text-sm px-4 py-1.5 rounded ${
+            className={`text-sm font-medium px-5 py-2 rounded-md transition-colors ${
               published
-                ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                ? "bg-gray-200 text-gray-800 hover:bg-gray-300"
                 : "bg-green-600 text-white hover:bg-green-700"
             }`}
           >
