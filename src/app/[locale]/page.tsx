@@ -1,17 +1,8 @@
-import { auth } from "@/lib/auth";
 import { getTranslations } from "next-intl/server";
-import { Link, redirect } from "@/i18n/routing";
+import { Link } from "@/i18n/routing";
 import { LanguageSwitcher } from "@/components/language-switcher";
 
-export default async function HomePage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
-  const { locale } = await params;
-  const session = await auth();
-  if (session?.user) redirect({ href: "/dashboard", locale: locale as "en" | "fr" });
-
+export default async function HomePage() {
   const t = await getTranslations("home");
   const tc = await getTranslations("common");
 
