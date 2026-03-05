@@ -1,6 +1,7 @@
 "use client";
 
 import { useDraggable } from "@dnd-kit/core";
+import { useTranslations } from "next-intl";
 
 export type FieldTypeId =
   | "text"
@@ -15,24 +16,31 @@ export type FieldTypeId =
 
 export interface FieldType {
   id: FieldTypeId;
-  label: string;
+  labelKey: string;
   icon: string;
   surveyType: string;
   inputType?: string;
   hasChoices?: boolean;
+  label: string; // resolved at render time
 }
 
-export const FIELD_TYPES: FieldType[] = [
-  { id: "text", label: "Text", icon: "Aa", surveyType: "text" },
-  { id: "email", label: "Email", icon: "@", surveyType: "text", inputType: "email" },
-  { id: "phone", label: "Phone", icon: "#", surveyType: "text", inputType: "tel" },
-  { id: "number", label: "Number", icon: "123", surveyType: "text", inputType: "number" },
-  { id: "textarea", label: "Textarea", icon: "¶", surveyType: "comment" },
-  { id: "dropdown", label: "Dropdown", icon: "▾", surveyType: "dropdown", hasChoices: true },
-  { id: "checkbox", label: "Checkbox", icon: "☑", surveyType: "checkbox", hasChoices: true },
-  { id: "radio", label: "Radio", icon: "◉", surveyType: "radiogroup", hasChoices: true },
-  { id: "date", label: "Date", icon: "📅", surveyType: "text", inputType: "date" },
+const FIELD_TYPE_DEFS: Omit<FieldType, "label">[] = [
+  { id: "text", labelKey: "fieldText", icon: "Aa", surveyType: "text" },
+  { id: "email", labelKey: "fieldEmail", icon: "@", surveyType: "text", inputType: "email" },
+  { id: "phone", labelKey: "fieldPhone", icon: "#", surveyType: "text", inputType: "tel" },
+  { id: "number", labelKey: "fieldNumber", icon: "123", surveyType: "text", inputType: "number" },
+  { id: "textarea", labelKey: "fieldTextarea", icon: "¶", surveyType: "comment" },
+  { id: "dropdown", labelKey: "fieldDropdown", icon: "▾", surveyType: "dropdown", hasChoices: true },
+  { id: "checkbox", labelKey: "fieldCheckbox", icon: "☑", surveyType: "checkbox", hasChoices: true },
+  { id: "radio", labelKey: "fieldRadio", icon: "◉", surveyType: "radiogroup", hasChoices: true },
+  { id: "date", labelKey: "fieldDate", icon: "📅", surveyType: "text", inputType: "date" },
 ];
+
+// Exported for use in form-builder (addField needs label + surveyType etc.)
+export let FIELD_TYPES: FieldType[] = FIELD_TYPE_DEFS.map((d) => ({
+  ...d,
+  label: d.labelKey, // fallback; resolved properly in FieldPalette
+}));
 
 function PaletteItem({ type, onAdd }: { type: FieldType; onAdd: () => void }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
@@ -60,9 +68,20 @@ interface FieldPaletteProps {
 }
 
 export function FieldPalette({ onAddField }: FieldPaletteProps) {
+  const t = useTranslations("builder");
+
+  // Resolve translated labels
+  const translatedTypes = FIELD_TYPE_DEFS.map((d) => ({
+    ...d,
+    label: t(d.labelKey),
+  }));
+
+  // Update the exported FIELD_TYPES so form-builder's addField uses translated labels
+  FIELD_TYPES = translatedTypes;
+
   return (
     <div className="space-y-0.5">
-      {FIELD_TYPES.map((type) => (
+      {translatedTypes.map((type) => (
         <PaletteItem key={type.id} type={type} onAdd={() => onAddField(type.id)} />
       ))}
     </div>

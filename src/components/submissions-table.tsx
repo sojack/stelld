@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 interface Submission {
   id: string;
@@ -15,6 +16,8 @@ interface SubmissionsTableProps {
 }
 
 export function SubmissionsTable({ submissions, formSchema }: SubmissionsTableProps) {
+  const t = useTranslations("submissions");
+  const tc = useTranslations("common");
   const [selected, setSelected] = useState<Submission | null>(null);
 
   const columns = getColumnsFromSubmissions(submissions);
@@ -22,7 +25,7 @@ export function SubmissionsTable({ submissions, formSchema }: SubmissionsTablePr
   if (submissions.length === 0) {
     return (
       <div className="text-center py-12 text-gray-500">
-        No submissions yet. Share your form to start collecting responses.
+        {t("noSubmissions")}
       </div>
     );
   }
@@ -34,7 +37,7 @@ export function SubmissionsTable({ submissions, formSchema }: SubmissionsTablePr
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-lg w-full max-h-[80vh] overflow-auto shadow-lg">
             <div className="flex justify-between items-center mb-5">
-              <h3 className="text-lg font-bold text-gray-900">Submission Detail</h3>
+              <h3 className="text-lg font-bold text-gray-900">{t("title")}</h3>
               <button onClick={() => setSelected(null)} className="text-gray-500 hover:text-gray-900 text-xl leading-none">&times;</button>
             </div>
             <dl className="space-y-4">
@@ -46,7 +49,7 @@ export function SubmissionsTable({ submissions, formSchema }: SubmissionsTablePr
               ))}
             </dl>
             <p className="mt-5 text-sm text-gray-600">
-              Submitted {new Date(selected.createdAt).toLocaleString()}
+              {t("submitted", { date: new Date(selected.createdAt).toLocaleString() })}
             </p>
           </div>
         </div>
@@ -57,7 +60,7 @@ export function SubmissionsTable({ submissions, formSchema }: SubmissionsTablePr
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b bg-gray-50">
-              <th className="text-left py-3 px-4 font-semibold text-gray-700">Date</th>
+              <th className="text-left py-3 px-4 font-semibold text-gray-700">{t("date")}</th>
               {columns.slice(0, 5).map((col) => (
                 <th key={col} className="text-left py-3 px-4 font-semibold text-gray-700">{col}</th>
               ))}
@@ -80,7 +83,7 @@ export function SubmissionsTable({ submissions, formSchema }: SubmissionsTablePr
                     onClick={() => setSelected(sub)}
                     className="text-sm font-medium text-green-700 hover:text-green-900 hover:underline transition-colors"
                   >
-                    View
+                    {tc("view")}
                   </button>
                 </td>
               </tr>

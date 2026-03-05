@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useTranslations } from "next-intl";
 import type { FormField } from "./types";
 
 interface PropertyEditorProps {
@@ -8,11 +9,32 @@ interface PropertyEditorProps {
   onChange: (updates: Partial<FormField>) => void;
 }
 
+// Helper functions for localized string support
+function getDefaultString(value: string | { default?: string; fr?: string } | undefined): string {
+  if (!value) return "";
+  if (typeof value === "string") return value;
+  return value.default ?? "";
+}
+
+function getFrenchString(value: string | { default?: string; fr?: string } | undefined): string {
+  if (!value || typeof value === "string") return "";
+  return value.fr ?? "";
+}
+
+function setFrenchString(
+  current: string | { default?: string; fr?: string } | undefined,
+  frValue: string
+): string | { default: string; fr?: string } {
+  const defaultVal = getDefaultString(current);
+  if (!frValue) return defaultVal; // no French = plain string
+  return { default: defaultVal, fr: frValue };
+}
+
 export function PropertyEditor({ field, onChange }: PropertyEditorProps) {
+  const t = useTranslations("builder");
   const labelRef = useRef<HTMLInputElement>(null);
   const prevFieldId = useRef(field._id);
 
-  // Auto-select label text when a new field is selected
   useEffect(() => {
     if (field._id !== prevFieldId.current) {
       prevFieldId.current = field._id;
@@ -20,18 +42,40 @@ export function PropertyEditor({ field, onChange }: PropertyEditorProps) {
       labelRef.current?.select();
     }
   }, [field._id]);
+
   const hasChoices = field.type === "dropdown" || field.type === "checkbox" || field.type === "radiogroup";
   const hasPlaceholder = field.type === "text" || field.type === "comment";
   const isNumber = field.inputType === "number";
 
+  const titleDefault = getDefaultString(field.title);
+  const titleFr = getFrenchString(field.title);
+  const placeholderFr = getFrenchString(field.placeholder);
+
   function updateChoice(index: number, value: string) {
     const newChoices = [...(field.choices ?? [])];
-    newChoices[index] = value;
+    const current = newChoices[index];
+    if (typeof current === "object") {
+      newChoices[index] = { ...current, default: value };
+    } else {
+      newChoices[index] = value;
+    }
+    onChange({ choices: newChoices });
+  }
+
+  function updateChoiceFr(index: number, frValue: string) {
+    const newChoices = [...(field.choices ?? [])];
+    const current = newChoices[index];
+    const defaultVal = typeof current === "string" ? current : (current as { default?: string }).default ?? "";
+    if (!frValue) {
+      newChoices[index] = defaultVal;
+    } else {
+      newChoices[index] = { default: defaultVal, fr: frValue } as unknown as string;
+    }
     onChange({ choices: newChoices });
   }
 
   function addChoice() {
-    const newChoices = [...(field.choices ?? []), `Option ${(field.choices?.length ?? 0) + 1}`];
+    const newChoices = [...(field.choices ?? []), t("defaultOption", { number: (field.choices?.length ?? 0) + 1 })];
     onChange({ choices: newChoices });
   }
 
@@ -40,18 +84,35 @@ export function PropertyEditor({ field, onChange }: PropertyEditorProps) {
     onChange({ choices: newChoices });
   }
 
+  function getChoiceDefault(choice: string | { default?: string; fr?: string }): string {
+    if (typeof choice === "string") return choice;
+    return choice.default ?? "";
+  }
+
+  function getChoiceFr(choice: string | { default?: string; fr?: string }): string {
+    if (typeof choice === "string") return "";
+    return choice.fr ?? "";
+  }
+
   return (
     <div className="space-y-4">
-      <h3 className="text-xs font-semibold text-gray-500 uppercase">Properties</h3>
+      <h3 className="text-xs font-semibold text-gray-500 uppercase">{t("properties")}</h3>
 
       {/* Label */}
       <div>
-        <label className="block text-sm font-medium text-gray-900 mb-1">Label</label>
+        <label className="block text-sm font-medium text-gray-900 mb-1">{t("label")}</label>
         <input
           ref={labelRef}
           type="text"
-          value={field.title}
-          onChange={(e) => onChange({ title: e.target.value })}
+          value={titleDefault}
+          onChange={(e) => {
+            const frVal = getFrenchString(field.title);
+            if (frVal) {
+              onChange({ title: { default: e.target.value, fr: frVal } as unknown as string });
+            } else {
+              onChange({ title: e.target.value });
+            }
+          }}
           onFocus={(e) => e.target.select()}
           className="w-full border rounded px-3 py-1.5 text-sm text-gray-900"
         />
@@ -59,7 +120,7 @@ export function PropertyEditor({ field, onChange }: PropertyEditorProps) {
 
       {/* Field Name */}
       <div>
-        <label className="block text-sm font-medium text-gray-900 mb-1">Field name</label>
+        <label className="block text-sm font-medium text-gray-900 mb-1">{t("fieldName")}</label>
         <input
           type="text"
           value={field.name}
@@ -67,7 +128,7 @@ export function PropertyEditor({ field, onChange }: PropertyEditorProps) {
           onFocus={(e) => e.target.select()}
           className="w-full border rounded px-3 py-1.5 text-sm font-mono text-gray-900"
         />
-        <p className="text-xs text-gray-500 mt-0.5">Used in submissions data</p>
+        <p className="text-xs text-gray-500 mt-0.5">{t("fieldNameHint")}</p>
       </div>
 
       {/* Required */}
@@ -79,18 +140,25 @@ export function PropertyEditor({ field, onChange }: PropertyEditorProps) {
             onChange={(e) => onChange({ isRequired: e.target.checked })}
             className="w-4 h-4"
           />
-          Required
+          {t("required")}
         </label>
       </div>
 
       {/* Placeholder */}
       {hasPlaceholder && (
         <div>
-          <label className="block text-sm font-medium text-gray-900 mb-1">Placeholder</label>
+          <label className="block text-sm font-medium text-gray-900 mb-1">{t("placeholder")}</label>
           <input
             type="text"
-            value={field.placeholder ?? ""}
-            onChange={(e) => onChange({ placeholder: e.target.value })}
+            value={getDefaultString(field.placeholder)}
+            onChange={(e) => {
+              const frVal = getFrenchString(field.placeholder);
+              if (frVal) {
+                onChange({ placeholder: { default: e.target.value, fr: frVal } as unknown as string });
+              } else {
+                onChange({ placeholder: e.target.value });
+              }
+            }}
             className="w-full border rounded px-3 py-1.5 text-sm text-gray-900"
           />
         </div>
@@ -100,7 +168,7 @@ export function PropertyEditor({ field, onChange }: PropertyEditorProps) {
       {isNumber && (
         <div className="flex gap-2">
           <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-900 mb-1">Min</label>
+            <label className="block text-sm font-medium text-gray-900 mb-1">{t("min")}</label>
             <input
               type="number"
               value={field.min ?? ""}
@@ -109,7 +177,7 @@ export function PropertyEditor({ field, onChange }: PropertyEditorProps) {
             />
           </div>
           <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-900 mb-1">Max</label>
+            <label className="block text-sm font-medium text-gray-900 mb-1">{t("max")}</label>
             <input
               type="number"
               value={field.max ?? ""}
@@ -123,13 +191,13 @@ export function PropertyEditor({ field, onChange }: PropertyEditorProps) {
       {/* Choices */}
       {hasChoices && (
         <div>
-          <label className="block text-sm font-medium text-gray-900 mb-1">Options</label>
+          <label className="block text-sm font-medium text-gray-900 mb-1">{t("options")}</label>
           <div className="space-y-1.5">
             {(field.choices ?? []).map((choice, i) => (
               <div key={i} className="flex items-center gap-1">
                 <input
                   type="text"
-                  value={choice}
+                  value={getChoiceDefault(choice as string | { default?: string; fr?: string })}
                   onChange={(e) => updateChoice(i, e.target.value)}
                   onFocus={(e) => e.target.select()}
                   className="flex-1 border rounded px-2 py-1 text-sm text-gray-900"
@@ -147,10 +215,64 @@ export function PropertyEditor({ field, onChange }: PropertyEditorProps) {
             onClick={addChoice}
             className="text-sm text-blue-600 hover:underline mt-1.5"
           >
-            + Add option
+            {t("addOption")}
           </button>
         </div>
       )}
+
+      {/* Translations section */}
+      <div className="border-t pt-4 mt-4">
+        <h3 className="text-xs font-semibold text-gray-500 uppercase mb-3">{t("translations")}</h3>
+
+        {/* French label */}
+        <div className="mb-3">
+          <label className="block text-sm font-medium text-gray-900 mb-1">{t("frenchLabel")}</label>
+          <input
+            type="text"
+            value={titleFr}
+            onChange={(e) => {
+              onChange({ title: setFrenchString(field.title, e.target.value) as unknown as string });
+            }}
+            placeholder={titleDefault}
+            className="w-full border rounded px-3 py-1.5 text-sm text-gray-900"
+          />
+        </div>
+
+        {/* French placeholder */}
+        {hasPlaceholder && (
+          <div className="mb-3">
+            <label className="block text-sm font-medium text-gray-900 mb-1">{t("frenchPlaceholder")}</label>
+            <input
+              type="text"
+              value={placeholderFr}
+              onChange={(e) => {
+                onChange({ placeholder: setFrenchString(field.placeholder, e.target.value) as unknown as string });
+              }}
+              placeholder={getDefaultString(field.placeholder)}
+              className="w-full border rounded px-3 py-1.5 text-sm text-gray-900"
+            />
+          </div>
+        )}
+
+        {/* French choices */}
+        {hasChoices && (field.choices ?? []).length > 0 && (
+          <div>
+            <label className="block text-sm font-medium text-gray-900 mb-1">{t("options")} (FR)</label>
+            <div className="space-y-1.5">
+              {(field.choices ?? []).map((choice, i) => (
+                <input
+                  key={i}
+                  type="text"
+                  value={getChoiceFr(choice as string | { default?: string; fr?: string })}
+                  onChange={(e) => updateChoiceFr(i, e.target.value)}
+                  placeholder={t("frenchOption", { option: getChoiceDefault(choice as string | { default?: string; fr?: string }) })}
+                  className="w-full border rounded px-2 py-1 text-sm text-gray-900"
+                />
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

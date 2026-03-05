@@ -17,6 +17,7 @@ import {
   arrayMove,
 } from "@dnd-kit/sortable";
 import { v4 as uuid } from "uuid";
+import { useTranslations, useLocale } from "next-intl";
 import { FieldPalette, FIELD_TYPES, type FieldTypeId } from "./builder/field-palette";
 import { CanvasField } from "./builder/canvas-field";
 import { PropertyEditor } from "./builder/property-editor";
@@ -27,6 +28,7 @@ interface FormBuilderProps {
   initialSchema: object;
   initialTitle: string;
   isPublished: boolean;
+  locale: string;
 }
 
 function parseSchema(schema: object): FormField[] {
@@ -41,7 +43,8 @@ function toSurveyJson(fields: FormField[]): object {
   return { pages: [{ elements }] };
 }
 
-export function FormBuilder({ formId, initialSchema, initialTitle, isPublished }: FormBuilderProps) {
+export function FormBuilder({ formId, initialSchema, initialTitle, isPublished, locale }: FormBuilderProps) {
+  const t = useTranslations("builder");
   const [title, setTitle] = useState(initialTitle);
   const [published, setPublished] = useState(isPublished);
   const [saving, setSaving] = useState(false);
@@ -100,7 +103,7 @@ export function FormBuilder({ formId, initialSchema, initialTitle, isPublished }
       title: fieldType.label,
       isRequired: false,
       ...(fieldType.inputType && { inputType: fieldType.inputType }),
-      ...(fieldType.hasChoices && { choices: ["Option 1", "Option 2", "Option 3"] }),
+      ...(fieldType.hasChoices && { choices: [t("defaultOption", { number: 1 }), t("defaultOption", { number: 2 }), t("defaultOption", { number: 3 })] }),
     };
     const newFields = [...fields, newField];
     updateFields(newFields);
@@ -160,7 +163,7 @@ export function FormBuilder({ formId, initialSchema, initialTitle, isPublished }
       {/* Toolbar */}
       <div className="bg-white border-b px-5 py-3 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <a href="/dashboard" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">&larr; Dashboard</a>
+          <a href={`/${locale}/dashboard`} className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">&larr; {t("dashboard")}</a>
           <div className="w-px h-5 bg-gray-200" />
           <input
             type="text"
@@ -172,15 +175,15 @@ export function FormBuilder({ formId, initialSchema, initialTitle, isPublished }
         </div>
         <div className="flex items-center gap-4">
           <span className="text-sm text-gray-500">
-            {saving ? "Saving..." : lastSaved ? `Saved ${lastSaved.toLocaleTimeString()}` : ""}
+            {saving ? t("saving") : lastSaved ? t("saved", { time: lastSaved.toLocaleTimeString() }) : ""}
           </span>
           {published && (
             <a
-              href={`/f/${formId}`}
+              href={`/${locale}/f/${formId}`}
               target="_blank"
               className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline"
             >
-              View live form
+              {t("viewLiveForm")}
             </a>
           )}
           <button
@@ -191,7 +194,7 @@ export function FormBuilder({ formId, initialSchema, initialTitle, isPublished }
                 : "bg-green-600 text-white hover:bg-green-700"
             }`}
           >
-            {published ? "Unpublish" : "Publish"}
+            {published ? t("unpublish") : t("publish")}
           </button>
         </div>
       </div>
@@ -206,7 +209,7 @@ export function FormBuilder({ formId, initialSchema, initialTitle, isPublished }
         <div className="flex-1 flex overflow-hidden">
           {/* Left: Field Palette */}
           <div className="w-[200px] bg-white border-r p-3 overflow-y-auto">
-            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Fields</h3>
+            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">{t("fields")}</h3>
             <FieldPalette onAddField={addField} />
           </div>
 
@@ -220,8 +223,8 @@ export function FormBuilder({ formId, initialSchema, initialTitle, isPublished }
             <div className="max-w-2xl mx-auto">
               {fields.length === 0 ? (
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center text-gray-400">
-                  <p className="text-lg mb-1">Drag fields here</p>
-                  <p className="text-sm">or click a field type on the left to add it</p>
+                  <p className="text-lg mb-1">{t("dragFieldsHere")}</p>
+                  <p className="text-sm">{t("dragFieldsHint")}</p>
                 </div>
               ) : (
                 <SortableContext
@@ -253,7 +256,7 @@ export function FormBuilder({ formId, initialSchema, initialTitle, isPublished }
               />
             ) : (
               <div className="text-sm text-gray-500 text-center pt-8">
-                Select a field to edit its properties
+                {t("selectFieldHint")}
               </div>
             )}
           </div>
@@ -264,7 +267,10 @@ export function FormBuilder({ formId, initialSchema, initialTitle, isPublished }
             <div className="bg-white border border-blue-300 rounded px-3 py-2 shadow-lg text-sm">
               {activeId.startsWith("palette-")
                 ? FIELD_TYPES.find((t) => t.id === activeId.replace("palette-", ""))?.label
-                : fields.find((f) => f._id === activeId)?.title}
+                : (() => {
+                    const title = fields.find((f) => f._id === activeId)?.title;
+                    return typeof title === "string" ? title : title?.default ?? "";
+                  })()}
             </div>
           ) : null}
         </DragOverlay>

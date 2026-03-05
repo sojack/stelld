@@ -1,19 +1,20 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { redirect, notFound } from "next/navigation";
+import { notFound } from "next/navigation";
+import { redirect } from "@/i18n/routing";
 import { FormBuilder } from "@/components/form-builder";
 
 export default async function BuilderPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ locale: string; id: string }>;
 }) {
-  const { id } = await params;
+  const { locale, id } = await params;
   const session = await auth();
-  if (!session?.user?.id) redirect("/login");
+  if (!session?.user?.id) redirect({ href: "/login", locale: locale as "en" | "fr" });
 
   const form = await prisma.form.findFirst({
-    where: { id, userId: session.user.id },
+    where: { id, userId: session!.user!.id },
   });
 
   if (!form) notFound();
@@ -24,6 +25,7 @@ export default async function BuilderPage({
       initialSchema={form.schema as object}
       initialTitle={form.title}
       isPublished={form.isPublished}
+      locale={locale}
     />
   );
 }

@@ -6,7 +6,8 @@ const fromEmail = process.env.SES_FROM_EMAIL ?? "noreply@yourapp.ca";
 
 export async function sendPasswordResetEmail(toEmail: string, token: string) {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-  const resetLink = `${appUrl}/reset-password?token=${token}`;
+  const resetLinkEn = `${appUrl}/en/reset-password?token=${token}`;
+  const resetLinkFr = `${appUrl}/fr/reset-password?token=${token}`;
 
   try {
     await ses.send(
@@ -14,17 +15,21 @@ export async function sendPasswordResetEmail(toEmail: string, token: string) {
         Source: fromEmail,
         Destination: { ToAddresses: [toEmail] },
         Message: {
-          Subject: { Data: "Reset your Stelld password" },
+          Subject: { Data: "Reset your Stelld password / Réinitialisez votre mot de passe Stelld" },
           Body: {
             Html: {
               Data: `
                 <p>You requested a password reset for your Stelld account.</p>
-                <p><a href="${resetLink}">Click here to reset your password</a></p>
+                <p><a href="${resetLinkEn}">Click here to reset your password</a></p>
                 <p>This link expires in 1 hour. If you didn't request this, you can safely ignore this email.</p>
+                <hr style="margin: 24px 0; border: none; border-top: 1px solid #e5e7eb;" />
+                <p>Vous avez demandé une réinitialisation de mot de passe pour votre compte Stelld.</p>
+                <p><a href="${resetLinkFr}">Cliquez ici pour réinitialiser votre mot de passe</a></p>
+                <p>Ce lien expire dans 1 heure. Si vous n'avez pas fait cette demande, vous pouvez ignorer ce courriel.</p>
               `,
             },
             Text: {
-              Data: `You requested a password reset for your Stelld account.\n\nReset your password: ${resetLink}\n\nThis link expires in 1 hour. If you didn't request this, you can safely ignore this email.`,
+              Data: `You requested a password reset for your Stelld account.\n\nReset your password: ${resetLinkEn}\n\nThis link expires in 1 hour. If you didn't request this, you can safely ignore this email.\n\n---\n\nVous avez demandé une réinitialisation de mot de passe pour votre compte Stelld.\n\nRéinitialisez votre mot de passe : ${resetLinkFr}\n\nCe lien expire dans 1 heure. Si vous n'avez pas fait cette demande, vous pouvez ignorer ce courriel.`,
             },
           },
         },
@@ -42,7 +47,8 @@ export async function sendSubmissionNotification(
   submissionId: string
 ) {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-  const dashboardLink = `${appUrl}/dashboard/forms/${formId}`;
+  const dashboardLinkEn = `${appUrl}/en/dashboard/forms/${formId}`;
+  const dashboardLinkFr = `${appUrl}/fr/dashboard/forms/${formId}`;
 
   try {
     await ses.send(
@@ -50,23 +56,25 @@ export async function sendSubmissionNotification(
         Source: fromEmail,
         Destination: { ToAddresses: [toEmail] },
         Message: {
-          Subject: { Data: `New response on "${formTitle}"` },
+          Subject: { Data: `New response on "${formTitle}" / Nouvelle réponse sur « ${formTitle} »` },
           Body: {
             Html: {
               Data: `
                 <p>You received a new submission on your form <strong>${formTitle}</strong>.</p>
-                <p><a href="${dashboardLink}">View submissions in your dashboard</a></p>
+                <p><a href="${dashboardLinkEn}">View submissions in your dashboard</a></p>
+                <hr style="margin: 24px 0; border: none; border-top: 1px solid #e5e7eb;" />
+                <p>Vous avez reçu une nouvelle soumission sur votre formulaire <strong>${formTitle}</strong>.</p>
+                <p><a href="${dashboardLinkFr}">Voir les soumissions dans votre tableau de bord</a></p>
               `,
             },
             Text: {
-              Data: `You received a new submission on your form "${formTitle}". View it at: ${dashboardLink}`,
+              Data: `You received a new submission on your form "${formTitle}". View it at: ${dashboardLinkEn}\n\n---\n\nVous avez reçu une nouvelle soumission sur votre formulaire « ${formTitle} ». Consultez-la ici : ${dashboardLinkFr}`,
             },
           },
         },
       })
     );
   } catch (error) {
-    // Log but don't fail the submission if email fails
     console.error("Failed to send notification email:", error);
   }
 }

@@ -2,7 +2,14 @@
 
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import type { FormField } from "./types";
+import { useTranslations } from "next-intl";
+import type { FormField, LocalizedString } from "./types";
+
+function getDefault(value: LocalizedString | undefined): string {
+  if (!value) return "";
+  if (typeof value === "string") return value;
+  return value.default ?? "";
+}
 
 interface CanvasFieldProps {
   field: FormField;
@@ -12,16 +19,17 @@ interface CanvasFieldProps {
 }
 
 function FieldPreview({ field }: { field: FormField }) {
+  const t = useTranslations("builder");
   const baseClass = "w-full border rounded px-3 py-2 bg-gray-50 text-sm text-gray-500 pointer-events-none";
 
   if (field.type === "comment") {
-    return <textarea className={`${baseClass} h-20 resize-none`} placeholder={field.placeholder || "Long text answer"} readOnly />;
+    return <textarea className={`${baseClass} h-20 resize-none`} placeholder={getDefault(field.placeholder) || t("longTextPlaceholder")} readOnly />;
   }
 
   if (field.type === "dropdown") {
     return (
       <select className={baseClass} disabled>
-        <option>Select an option...</option>
+        <option>{t("selectOption")}</option>
       </select>
     );
   }
@@ -33,7 +41,7 @@ function FieldPreview({ field }: { field: FormField }) {
         {(field.choices ?? []).map((choice, i) => (
           <label key={i} className="flex items-center gap-2 text-sm text-gray-700 pointer-events-none">
             <input type={inputType} disabled className="pointer-events-none" />
-            {choice}
+            {getDefault(choice as LocalizedString)}
           </label>
         ))}
       </div>
@@ -44,13 +52,14 @@ function FieldPreview({ field }: { field: FormField }) {
     <input
       type="text"
       className={baseClass}
-      placeholder={field.placeholder || `Enter ${field.title.toLowerCase()}...`}
+      placeholder={getDefault(field.placeholder) || t("enterPlaceholder", { label: getDefault(field.title).toLowerCase() })}
       readOnly
     />
   );
 }
 
 export function CanvasField({ field, isSelected, onSelect, onDelete }: CanvasFieldProps) {
+  const t = useTranslations("builder");
   const {
     attributes,
     listeners,
@@ -80,16 +89,15 @@ export function CanvasField({ field, isSelected, onSelect, onDelete }: CanvasFie
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1">
           <div className="flex items-center gap-1 mb-2">
-            {/* Drag handle */}
             <span
               {...attributes}
               {...listeners}
               className="cursor-grab text-gray-400 hover:text-gray-700 mr-1.5 text-lg leading-none"
-              title="Drag to reorder"
+              title={t("dragToReorder")}
             >
               ⠿
             </span>
-            <span className="text-sm font-medium text-gray-900">{field.title}</span>
+            <span className="text-sm font-medium text-gray-900">{getDefault(field.title)}</span>
             {field.isRequired && <span className="text-red-500 text-sm">*</span>}
           </div>
           <FieldPreview field={field} />
@@ -101,7 +109,7 @@ export function CanvasField({ field, isSelected, onSelect, onDelete }: CanvasFie
               onDelete();
             }}
             className="text-gray-400 hover:text-red-500 text-lg leading-none"
-            title="Delete field"
+            title={t("deleteField")}
           >
             &times;
           </button>
