@@ -68,7 +68,8 @@
     "invalidResetLinkDesc": "Ce lien de réinitialisation est invalide ou a expiré.",
     "requestNewLink": "Demander un nouveau lien",
     "passwordResetSuccess": "Votre mot de passe a été réinitialisé avec succès.",
-    "loginWithNewPassword": "Connectez-vous avec votre nouveau mot de passe"
+    "loginWithNewPassword": "Connectez-vous avec votre nouveau mot de passe",
+    "accountCreated": "Compte créé — veuillez vous connecter."
   },
   "dashboard": {
     "yourForms": "Vos formulaires",
@@ -80,6 +81,7 @@
     "submissions": "Soumissions",
     "submissionCount": "{count, plural, =1 {# soumission} other {# soumissions}}",
     "updated": "Mis à jour le {date}",
+    "creating": "Création...",
     "deleteConfirm": "Supprimer ce formulaire et toutes ses soumissions?",
     "allForms": "Tous les formulaires",
     "editForm": "Modifier le formulaire",
@@ -125,7 +127,11 @@
     "translations": "Traductions",
     "frenchLabel": "Libellé en français",
     "frenchPlaceholder": "Texte indicatif en français",
-    "frenchOption": "Français : {option}"
+    "frenchOption": "Français : {option}",
+    "saveFailed": "Échec de l'enregistrement",
+    "emptyFormError": "Ajoutez au moins un champ avant de publier",
+    "copyLink": "Copier le lien",
+    "copied": "Copié!"
   },
   "renderer": {
     "thankYou": "Merci!",
@@ -137,6 +143,16 @@
     "date": "Date",
     "submitted": "Soumis le {date}",
     "noSubmissions": "Aucune soumission pour le moment. Partagez votre formulaire pour commencer à collecter des réponses."
+  },
+  "notFound": {
+    "title": "Page introuvable",
+    "description": "La page que vous recherchez n'existe pas ou a été déplacée.",
+    "goHome": "Aller à l'accueil"
+  },
+  "error": {
+    "title": "Une erreur est survenue",
+    "description": "Une erreur inattendue s'est produite. Veuillez réessayer.",
+    "tryAgain": "Réessayer"
   },
   "metadata": {
     "title": "Stelld — Créateur de formulaires canadien",

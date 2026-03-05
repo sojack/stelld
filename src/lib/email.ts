@@ -4,6 +4,15 @@ const ses = new SESClient({ region: process.env.AWS_REGION ?? "ca-central-1" });
 
 const fromEmail = process.env.SES_FROM_EMAIL ?? "noreply@yourapp.ca";
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 export async function sendPasswordResetEmail(toEmail: string, token: string) {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
   const resetLinkEn = `${appUrl}/en/reset-password?token=${token}`;
@@ -49,6 +58,7 @@ export async function sendSubmissionNotification(
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
   const dashboardLinkEn = `${appUrl}/en/dashboard/forms/${formId}`;
   const dashboardLinkFr = `${appUrl}/fr/dashboard/forms/${formId}`;
+  const safeTitle = escapeHtml(formTitle);
 
   try {
     await ses.send(
@@ -60,10 +70,10 @@ export async function sendSubmissionNotification(
           Body: {
             Html: {
               Data: `
-                <p>You received a new submission on your form <strong>${formTitle}</strong>.</p>
+                <p>You received a new submission on your form <strong>${safeTitle}</strong>.</p>
                 <p><a href="${dashboardLinkEn}">View submissions in your dashboard</a></p>
                 <hr style="margin: 24px 0; border: none; border-top: 1px solid #e5e7eb;" />
-                <p>Vous avez reçu une nouvelle soumission sur votre formulaire <strong>${formTitle}</strong>.</p>
+                <p>Vous avez reçu une nouvelle soumission sur votre formulaire <strong>${safeTitle}</strong>.</p>
                 <p><a href="${dashboardLinkFr}">Voir les soumissions dans votre tableau de bord</a></p>
               `,
             },

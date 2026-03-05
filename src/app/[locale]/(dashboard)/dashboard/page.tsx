@@ -19,33 +19,57 @@ export default function DashboardPage() {
   const router = useRouter();
   const [forms, setForms] = useState<Form[]>([]);
   const [loading, setLoading] = useState(true);
+  const [creating, setCreating] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     fetchForms();
   }, []);
 
   async function fetchForms() {
-    const res = await fetch("/api/forms");
-    const data = await res.json();
-    setForms(data);
-    setLoading(false);
+    try {
+      const res = await fetch("/api/forms");
+      const data = await res.json();
+      setForms(data);
+    } catch {
+      setError(tc("error"));
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function createForm() {
-    const res = await fetch("/api/forms", { method: "POST" });
-    const form = await res.json();
-    router.push(`/builder/${form.id}`);
+    setCreating(true);
+    setError("");
+    try {
+      const res = await fetch("/api/forms", { method: "POST" });
+      const form = await res.json();
+      router.push(`/builder/${form.id}`);
+    } catch {
+      setError(tc("error"));
+      setCreating(false);
+    }
   }
 
   async function deleteForm(id: string) {
     if (!confirm(t("deleteConfirm"))) return;
-    await fetch(`/api/forms/${id}`, { method: "DELETE" });
-    fetchForms();
+    setError("");
+    try {
+      await fetch(`/api/forms/${id}`, { method: "DELETE" });
+      fetchForms();
+    } catch {
+      setError(tc("error"));
+    }
   }
 
   async function duplicateForm(id: string) {
-    const res = await fetch(`/api/forms/${id}/duplicate`, { method: "POST" });
-    if (res.ok) fetchForms();
+    setError("");
+    try {
+      const res = await fetch(`/api/forms/${id}/duplicate`, { method: "POST" });
+      if (res.ok) fetchForms();
+    } catch {
+      setError(tc("error"));
+    }
   }
 
   if (loading) return <div className="py-12 text-center text-gray-600 text-lg">{tc("loading")}</div>;
@@ -56,11 +80,13 @@ export default function DashboardPage() {
         <h1 className="text-3xl font-bold text-gray-900">{t("yourForms")}</h1>
         <button
           onClick={createForm}
-          className="bg-black text-white font-medium px-5 py-2.5 rounded-md hover:bg-gray-800 transition-colors"
+          disabled={creating}
+          className="bg-black text-white font-medium px-5 py-2.5 rounded-md hover:bg-gray-800 transition-colors disabled:opacity-50"
         >
-          {t("newForm")}
+          {creating ? t("creating") : t("newForm")}
         </button>
       </div>
+      {error && <p className="text-red-600 font-medium mb-4">{error}</p>}
       {forms.length === 0 ? (
         <div className="text-center py-16 text-gray-500">
           <p className="text-lg mb-2">{t("noForms")}</p>

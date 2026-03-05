@@ -1,9 +1,20 @@
 import { prisma } from "@/lib/db";
 import { sendPasswordResetEmail } from "@/lib/email";
 import { NextResponse } from "next/server";
+import { headers } from "next/headers";
 import crypto from "crypto";
+import { createRateLimiter } from "@/lib/rate-limit";
+
+const isRateLimited = createRateLimiter(3, 60000); // 3 per minute
 
 export async function POST(req: Request) {
+  const headersList = await headers();
+  const ip = headersList.get("x-forwarded-for") ?? "unknown";
+
+  if (isRateLimited(ip)) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
+
   const { email } = await req.json();
 
   if (!email) {
