@@ -108,6 +108,7 @@ export function FormRenderer({ formId, schema, thankYouMessage }: FormRendererPr
 
   const survey = new Model(schema);
   survey.applyTheme(THEME_OVERRIDES as Parameters<typeof survey.applyTheme>[0]);
+  survey.showCompletedPage = false;
   survey.onComplete.add(onComplete);
 
   return (
