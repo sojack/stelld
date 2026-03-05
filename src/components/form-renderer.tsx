@@ -39,6 +39,8 @@ const THEME_OVERRIDES = {
 export function FormRenderer({ formId, schema, thankYouMessage }: FormRendererProps) {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
+  const containerRef = useRef<HTMLDivElement>(null);
+  const surveyRef = useRef<Model | null>(null);
 
   const onComplete = useCallback(async (sender: Model) => {
     const res = await fetch("/api/submissions", {
@@ -58,6 +60,38 @@ export function FormRenderer({ formId, schema, thankYouMessage }: FormRendererPr
 
     setSubmitted(true);
   }, [formId]);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    function handleFocusIn(e: FocusEvent) {
+      const target = e.target as HTMLElement;
+      if (
+        (target instanceof HTMLInputElement &&
+          (target.type === "text" || target.type === "email" || target.type === "tel" ||
+           target.type === "number" || target.type === "date" || target.type === "url")) ||
+        target instanceof HTMLTextAreaElement
+      ) {
+        setTimeout(() => {
+          (target as HTMLInputElement | HTMLTextAreaElement).select();
+        }, 50);
+      }
+    }
+
+    container.addEventListener("focusin", handleFocusIn);
+    return () => container.removeEventListener("focusin", handleFocusIn);
+  }, []);
+
+  useEffect(() => {
+    if (!surveyRef.current) {
+      const survey = new Model(schema);
+      survey.applyTheme(THEME_OVERRIDES as Parameters<typeof survey.applyTheme>[0]);
+      survey.showCompletedPage = false;
+      survey.onComplete.add(onComplete);
+      surveyRef.current = survey;
+    }
+  }, [schema, onComplete]);
 
   if (submitted) {
     return (
@@ -80,50 +114,23 @@ export function FormRenderer({ formId, schema, thankYouMessage }: FormRendererPr
     );
   }
 
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  // Auto-select text on focus for all text inputs within the survey
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    function handleFocusIn(e: FocusEvent) {
-      const target = e.target as HTMLElement;
-      if (
-        (target instanceof HTMLInputElement &&
-          (target.type === "text" || target.type === "email" || target.type === "tel" ||
-           target.type === "number" || target.type === "date" || target.type === "url")) ||
-        target instanceof HTMLTextAreaElement
-      ) {
-        // Delay to let SurveyJS finish its focus handling so selection is visible
-        setTimeout(() => {
-          (target as HTMLInputElement | HTMLTextAreaElement).select();
-        }, 50);
-      }
-    }
-
-    container.addEventListener("focusin", handleFocusIn);
-    return () => container.removeEventListener("focusin", handleFocusIn);
-  }, []);
-
-  const survey = new Model(schema);
-  survey.applyTheme(THEME_OVERRIDES as Parameters<typeof survey.applyTheme>[0]);
-  survey.showCompletedPage = false;
-  survey.onComplete.add(onComplete);
+  if (!surveyRef.current) {
+    return null;
+  }
 
   return (
     <div ref={containerRef} className="min-h-screen bg-gray-50 py-10">
-      {/* Honeypot — hidden from humans, visible to bots */}
       <input
         id="_hp_field"
         name="_hp_field"
         type="text"
-        style={{ position: "absolute", left: "-9999px", tabIndex: -1 } as React.CSSProperties}
+        tabIndex={-1}
+        style={{ position: "absolute", left: "-9999px" }}
         autoComplete="off"
         aria-hidden="true"
       />
       <div className="max-w-3xl mx-auto">
-        <Survey model={survey} />
+        <Survey model={surveyRef.current} />
       </div>
     </div>
   );
