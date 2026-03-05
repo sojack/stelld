@@ -6,6 +6,7 @@ import { Survey } from "survey-react-ui";
 import { useTranslations } from "next-intl";
 import "survey-core/survey-core.min.css";
 import "./form-renderer.css";
+import { Footer } from "./footer";
 
 interface FormRendererProps {
   formId: string;
@@ -122,7 +123,7 @@ export function FormRenderer({ formId, schema, thankYouMessage, locale }: FormRe
   }
 
   return (
-    <div ref={containerRef} className="min-h-screen bg-gray-50 py-10">
+    <div ref={containerRef} className="min-h-screen bg-gray-50 flex flex-col">
       <input
         id="_hp_field"
         name="_hp_field"
@@ -132,9 +133,10 @@ export function FormRenderer({ formId, schema, thankYouMessage, locale }: FormRe
         autoComplete="off"
         aria-hidden="true"
       />
-      <div className="max-w-3xl mx-auto">
+      <div className="flex-1 max-w-3xl mx-auto w-full py-10">
         <Survey model={survey} />
       </div>
+      <Footer />
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { getTranslations } from "next-intl/server";
 import { Link, redirect } from "@/i18n/routing";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { Footer } from "@/components/footer";
 
 export default async function DashboardLayout({
   children,
@@ -17,7 +18,7 @@ export default async function DashboardLayout({
   const t = await getTranslations("nav");
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <nav className="bg-white border-b px-6 py-4 flex items-center justify-between">
         <Link href="/dashboard" className="font-bold text-xl text-gray-900">Stelld</Link>
         <div className="flex items-center gap-5">
@@ -34,7 +35,8 @@ export default async function DashboardLayout({
           </form>
         </div>
       </nav>
-      <main className="max-w-6xl mx-auto p-8">{children}</main>
+      <main className="flex-1 max-w-6xl mx-auto p-8 w-full">{children}</main>
+      <Footer />
     </div>
   );
 }
