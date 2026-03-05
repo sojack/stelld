@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Model } from "survey-core";
 import { Survey } from "survey-react-ui";
 import "survey-core/survey-core.min.css";
@@ -40,26 +40,38 @@ export function FormRenderer({ formId, schema, thankYouMessage }: FormRendererPr
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
   const containerRef = useRef<HTMLDivElement>(null);
-  const surveyRef = useRef<Model | null>(null);
 
-  const onComplete = useCallback(async (sender: Model) => {
-    const res = await fetch("/api/submissions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        formId,
-        data: sender.data,
-        honeypot: (document.getElementById("_hp_field") as HTMLInputElement)?.value ?? "",
-      }),
-    });
+  const survey = useMemo(() => {
+    const s = new Model(schema);
+    s.applyTheme(THEME_OVERRIDES as Parameters<typeof s.applyTheme>[0]);
+    s.showCompletedPage = false;
+    return s;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-    if (!res.ok) {
-      setError("Something went wrong. Please try again.");
-      return;
-    }
+  useEffect(() => {
+    const handler = async (sender: Model) => {
+      const res = await fetch("/api/submissions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          formId,
+          data: sender.data,
+          honeypot: (document.getElementById("_hp_field") as HTMLInputElement)?.value ?? "",
+        }),
+      });
 
-    setSubmitted(true);
-  }, [formId]);
+      if (!res.ok) {
+        setError("Something went wrong. Please try again.");
+        return;
+      }
+
+      setSubmitted(true);
+    };
+
+    survey.onComplete.add(handler);
+    return () => { survey.onComplete.remove(handler); };
+  }, [survey, formId]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -83,16 +95,6 @@ export function FormRenderer({ formId, schema, thankYouMessage }: FormRendererPr
     return () => container.removeEventListener("focusin", handleFocusIn);
   }, []);
 
-  useEffect(() => {
-    if (!surveyRef.current) {
-      const survey = new Model(schema);
-      survey.applyTheme(THEME_OVERRIDES as Parameters<typeof survey.applyTheme>[0]);
-      survey.showCompletedPage = false;
-      survey.onComplete.add(onComplete);
-      surveyRef.current = survey;
-    }
-  }, [schema, onComplete]);
-
   if (submitted) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -114,10 +116,6 @@ export function FormRenderer({ formId, schema, thankYouMessage }: FormRendererPr
     );
   }
 
-  if (!surveyRef.current) {
-    return null;
-  }
-
   return (
     <div ref={containerRef} className="min-h-screen bg-gray-50 py-10">
       <input
@@ -130,7 +128,7 @@ export function FormRenderer({ formId, schema, thankYouMessage }: FormRendererPr
         aria-hidden="true"
       />
       <div className="max-w-3xl mx-auto">
-        <Survey model={surveyRef.current} />
+        <Survey model={survey} />
       </div>
     </div>
   );
