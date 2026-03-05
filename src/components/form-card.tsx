@@ -1,6 +1,7 @@
 "use client";
 
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/routing";
 
 interface FormCardProps {
   id: string;
@@ -15,6 +16,9 @@ interface FormCardProps {
 export function FormCard({
   id, title, isPublished, submissionCount, updatedAt, onDelete, onDuplicate
 }: FormCardProps) {
+  const t = useTranslations("dashboard");
+  const tc = useTranslations("common");
+
   return (
     <div className="bg-white border rounded-lg p-5 hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between">
@@ -24,10 +28,10 @@ export function FormCard({
           </Link>
           <div className="flex items-center gap-4 mt-2 text-sm">
             <span className={`font-medium ${isPublished ? "text-green-700" : "text-gray-500"}`}>
-              {isPublished ? "Published" : "Draft"}
+              {isPublished ? t("published") : t("draft")}
             </span>
-            <span className="text-gray-600">{submissionCount} submissions</span>
-            <span className="text-gray-600">Updated {new Date(updatedAt).toLocaleDateString()}</span>
+            <span className="text-gray-600">{t("submissionCount", { count: submissionCount })}</span>
+            <span className="text-gray-600">{t("updated", { date: new Date(updatedAt).toLocaleDateString() })}</span>
           </div>
         </div>
         <div className="flex gap-2">
@@ -35,19 +39,19 @@ export function FormCard({
             href={`/dashboard/forms/${id}`}
             className="text-sm font-medium px-3 py-1.5 border rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
           >
-            Submissions
+            {t("submissions")}
           </Link>
           <button
             onClick={() => onDuplicate(id)}
             className="text-sm font-medium px-3 py-1.5 border rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
           >
-            Duplicate
+            {tc("duplicate")}
           </button>
           <button
             onClick={() => onDelete(id)}
             className="text-sm font-medium px-3 py-1.5 border rounded-md text-red-600 hover:bg-red-50 transition-colors"
           >
-            Delete
+            {tc("delete")}
           </button>
         </div>
       </div>

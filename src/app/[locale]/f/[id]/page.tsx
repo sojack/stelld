@@ -5,9 +5,9 @@ import { FormRenderer } from "@/components/form-renderer";
 export default async function PublicFormPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ locale: string; id: string }>;
 }) {
-  const { id } = await params;
+  const { locale, id } = await params;
 
   const form = await prisma.form.findFirst({
     where: { id, isPublished: true },
@@ -21,7 +21,8 @@ export default async function PublicFormPage({
     <FormRenderer
       formId={form.id}
       schema={form.schema as object}
-      thankYouMessage={settings.thankYouMessage ?? "Thank you for your submission!"}
+      thankYouMessage={settings.thankYouMessage}
+      locale={locale}
     />
   );
 }

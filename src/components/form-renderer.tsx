@@ -3,13 +3,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Model } from "survey-core";
 import { Survey } from "survey-react-ui";
+import { useTranslations } from "next-intl";
 import "survey-core/survey-core.min.css";
 import "./form-renderer.css";
 
 interface FormRendererProps {
   formId: string;
   schema: object;
-  thankYouMessage: string;
+  thankYouMessage?: string;
+  locale: string;
 }
 
 const THEME_OVERRIDES = {
@@ -36,7 +38,8 @@ const THEME_OVERRIDES = {
   },
 };
 
-export function FormRenderer({ formId, schema, thankYouMessage }: FormRendererProps) {
+export function FormRenderer({ formId, schema, thankYouMessage, locale }: FormRendererProps) {
+  const t = useTranslations("renderer");
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
   const containerRef = useRef<HTMLDivElement>(null);
@@ -45,6 +48,8 @@ export function FormRenderer({ formId, schema, thankYouMessage }: FormRendererPr
     const s = new Model(schema);
     s.applyTheme(THEME_OVERRIDES as Parameters<typeof s.applyTheme>[0]);
     s.showCompletedPage = false;
+    // Set SurveyJS locale for built-in UI translations and localized field strings
+    s.locale = locale;
     return s;
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -62,7 +67,7 @@ export function FormRenderer({ formId, schema, thankYouMessage }: FormRendererPr
       });
 
       if (!res.ok) {
-        setError("Something went wrong. Please try again.");
+        setError(t("submitError"));
         return;
       }
 
@@ -71,7 +76,7 @@ export function FormRenderer({ formId, schema, thankYouMessage }: FormRendererPr
 
     survey.onComplete.add(handler);
     return () => { survey.onComplete.remove(handler); };
-  }, [survey, formId]);
+  }, [survey, formId, t]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -99,8 +104,8 @@ export function FormRenderer({ formId, schema, thankYouMessage }: FormRendererPr
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center p-8 bg-white rounded-lg shadow-sm border max-w-md">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Thank you!</h2>
-          <p className="text-gray-600">{thankYouMessage}</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">{t("thankYou")}</h2>
+          <p className="text-gray-600">{thankYouMessage || t("defaultThankYou")}</p>
         </div>
       </div>
     );

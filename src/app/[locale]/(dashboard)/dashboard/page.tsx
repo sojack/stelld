@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { useRouter } from "@/i18n/routing";
 import { FormCard } from "@/components/form-card";
 
 interface Form {
@@ -13,6 +14,8 @@ interface Form {
 }
 
 export default function DashboardPage() {
+  const t = useTranslations("dashboard");
+  const tc = useTranslations("common");
   const router = useRouter();
   const [forms, setForms] = useState<Form[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,7 +38,7 @@ export default function DashboardPage() {
   }
 
   async function deleteForm(id: string) {
-    if (!confirm("Delete this form and all its submissions?")) return;
+    if (!confirm(t("deleteConfirm"))) return;
     await fetch(`/api/forms/${id}`, { method: "DELETE" });
     fetchForms();
   }
@@ -45,23 +48,23 @@ export default function DashboardPage() {
     if (res.ok) fetchForms();
   }
 
-  if (loading) return <div className="py-12 text-center text-gray-600 text-lg">Loading...</div>;
+  if (loading) return <div className="py-12 text-center text-gray-600 text-lg">{tc("loading")}</div>;
 
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Your Forms</h1>
+        <h1 className="text-3xl font-bold text-gray-900">{t("yourForms")}</h1>
         <button
           onClick={createForm}
           className="bg-black text-white font-medium px-5 py-2.5 rounded-md hover:bg-gray-800 transition-colors"
         >
-          + New Form
+          {t("newForm")}
         </button>
       </div>
       {forms.length === 0 ? (
         <div className="text-center py-16 text-gray-500">
-          <p className="text-lg mb-2">No forms yet</p>
-          <p className="text-sm">Create your first form to get started.</p>
+          <p className="text-lg mb-2">{t("noForms")}</p>
+          <p className="text-sm">{t("noFormsDesc")}</p>
         </div>
       ) : (
         <div className="space-y-3">
