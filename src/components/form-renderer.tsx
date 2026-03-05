@@ -55,6 +55,11 @@ export function FormRenderer({ formId, schema, thankYouMessage, locale }: FormRe
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Update SurveyJS locale when the URL locale changes
+  useEffect(() => {
+    survey.locale = locale;
+  }, [survey, locale]);
+
   useEffect(() => {
     const handler = async (sender: Model) => {
       const res = await fetch("/api/submissions", {
