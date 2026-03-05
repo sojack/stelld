@@ -68,7 +68,8 @@
     "invalidResetLinkDesc": "This password reset link is invalid or has expired.",
     "requestNewLink": "Request a new reset link",
     "passwordResetSuccess": "Your password has been reset successfully.",
-    "loginWithNewPassword": "Log in with your new password"
+    "loginWithNewPassword": "Log in with your new password",
+    "accountCreated": "Account created — please log in."
   },
   "dashboard": {
     "yourForms": "Your Forms",
@@ -80,6 +81,7 @@
     "submissions": "Submissions",
     "submissionCount": "{count, plural, =1 {# submission} other {# submissions}}",
     "updated": "Updated {date}",
+    "creating": "Creating...",
     "deleteConfirm": "Delete this form and all its submissions?",
     "allForms": "All forms",
     "editForm": "Edit form",
@@ -125,7 +127,11 @@
     "translations": "Translations",
     "frenchLabel": "French label",
     "frenchPlaceholder": "French placeholder",
-    "frenchOption": "French: {option}"
+    "frenchOption": "French: {option}",
+    "saveFailed": "Save failed",
+    "emptyFormError": "Add at least one field before publishing",
+    "copyLink": "Copy link",
+    "copied": "Copied!"
   },
   "renderer": {
     "thankYou": "Thank you!",
@@ -137,6 +143,16 @@
     "date": "Date",
     "submitted": "Submitted {date}",
     "noSubmissions": "No submissions yet. Share your form to start collecting responses."
+  },
+  "notFound": {
+    "title": "Page not found",
+    "description": "The page you're looking for doesn't exist or has been moved.",
+    "goHome": "Go to homepage"
+  },
+  "error": {
+    "title": "Something went wrong",
+    "description": "An unexpected error occurred. Please try again.",
+    "tryAgain": "Try again"
   },
   "metadata": {
     "title": "Stelld — Simple Canadian Form Builder",

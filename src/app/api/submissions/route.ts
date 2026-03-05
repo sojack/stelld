@@ -2,20 +2,11 @@ import { prisma } from "@/lib/db";
 import { sendSubmissionNotification } from "@/lib/email";
 import { NextResponse } from "next/server";
 import { headers } from "next/headers";
+import { createRateLimiter } from "@/lib/rate-limit";
 
-// Simple in-memory rate limiter
-const rateLimit = new Map<string, { count: number; resetAt: number }>();
+const isRateLimited = createRateLimiter(10, 60000); // 10 per minute
 
-function isRateLimited(ip: string): boolean {
-  const now = Date.now();
-  const entry = rateLimit.get(ip);
-  if (!entry || entry.resetAt < now) {
-    rateLimit.set(ip, { count: 1, resetAt: now + 60000 });
-    return false;
-  }
-  entry.count++;
-  return entry.count > 10; // 10 per minute
-}
+const MAX_BODY_SIZE = 1024 * 1024; // 1MB
 
 export async function POST(req: Request) {
   const headersList = await headers();
@@ -23,6 +14,12 @@ export async function POST(req: Request) {
 
   if (isRateLimited(ip)) {
     return NextResponse.json({ error: "Too many submissions" }, { status: 429 });
+  }
+
+  // Check body size before parsing
+  const contentLength = headersList.get("content-length");
+  if (contentLength && parseInt(contentLength, 10) > MAX_BODY_SIZE) {
+    return NextResponse.json({ error: "Request too large" }, { status: 413 });
   }
 
   const { formId, data, honeypot } = await req.json();

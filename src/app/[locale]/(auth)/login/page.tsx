@@ -4,12 +4,15 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/routing";
+import { useSearchParams } from "next/navigation";
 import { LanguageSwitcher } from "@/components/language-switcher";
 
 export default function LoginPage() {
   const t = useTranslations("auth");
   const tc = useTranslations("common");
   const locale = useLocale();
+  const searchParams = useSearchParams();
+  const registered = searchParams.get("registered") === "true";
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -46,6 +49,11 @@ export default function LoginPage() {
         </div>
         <div className="bg-white border border-gray-200 rounded-lg p-8 shadow-sm">
           <h1 className="text-2xl font-bold text-gray-900 mb-6">{t("logIn")}</h1>
+          {registered && (
+            <p className="text-green-700 bg-green-50 border border-green-200 rounded-md px-4 py-2 font-medium mb-4">
+              {t("accountCreated")}
+            </p>
+          )}
           {error && <p className="text-red-600 font-medium mb-4">{error}</p>}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>

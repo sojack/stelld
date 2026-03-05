@@ -48,10 +48,13 @@ export function FormBuilder({ formId, initialSchema, initialTitle, isPublished, 
   const [title, setTitle] = useState(initialTitle);
   const [published, setPublished] = useState(isPublished);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [fields, setFields] = useState<FormField[]>(() => parseSchema(initialSchema));
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [publishError, setPublishError] = useState("");
+  const [copied, setCopied] = useState(false);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const fieldCounter = useRef(fields.length);
 
@@ -77,14 +80,23 @@ export function FormBuilder({ formId, initialSchema, initialTitle, isPublished, 
 
   const saveForm = useCallback(async (updatedFields?: FormField[]) => {
     setSaving(true);
+    setSaveError(false);
     const schema = toSurveyJson(updatedFields ?? fields);
-    await fetch(`/api/forms/${formId}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, schema }),
-    });
+    try {
+      const res = await fetch(`/api/forms/${formId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, schema }),
+      });
+      if (!res.ok) {
+        setSaveError(true);
+      } else {
+        setLastSaved(new Date());
+      }
+    } catch {
+      setSaveError(true);
+    }
     setSaving(false);
-    setLastSaved(new Date());
   }, [formId, title, fields]);
 
   function updateFields(newFields: FormField[]) {
@@ -150,12 +162,24 @@ export function FormBuilder({ formId, initialSchema, initialTitle, isPublished, 
 
   async function togglePublish() {
     const newState = !published;
+    if (newState && fields.length === 0) {
+      setPublishError(t("emptyFormError"));
+      return;
+    }
+    setPublishError("");
     await fetch(`/api/forms/${formId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ isPublished: newState }),
     });
     setPublished(newState);
+  }
+
+  async function copyLink() {
+    const url = `${window.location.origin}/${locale}/f/${formId}`;
+    await navigator.clipboard.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   }
 
   return (
@@ -170,21 +194,39 @@ export function FormBuilder({ formId, initialSchema, initialTitle, isPublished, 
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             onBlur={() => saveForm()}
+            maxLength={200}
             className="font-semibold text-lg text-gray-900 border-none outline-none focus:ring-1 focus:ring-gray-300 rounded px-2 py-1"
           />
         </div>
         <div className="flex items-center gap-4">
-          <span className="text-sm text-gray-500">
-            {saving ? t("saving") : lastSaved ? t("saved", { time: lastSaved.toLocaleTimeString() }) : ""}
+          <span className="text-sm">
+            {saving
+              ? <span className="text-gray-500">{t("saving")}</span>
+              : saveError
+                ? <span className="text-red-600">{t("saveFailed")}</span>
+                : lastSaved
+                  ? <span className="text-gray-500">{t("saved", { time: lastSaved.toLocaleTimeString() })}</span>
+                  : null}
           </span>
+          {publishError && (
+            <span className="text-sm text-red-600">{publishError}</span>
+          )}
           {published && (
-            <a
-              href={`/${locale}/f/${formId}`}
-              target="_blank"
-              className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline"
-            >
-              {t("viewLiveForm")}
-            </a>
+            <>
+              <a
+                href={`/${locale}/f/${formId}`}
+                target="_blank"
+                className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline"
+              >
+                {t("viewLiveForm")}
+              </a>
+              <button
+                onClick={copyLink}
+                className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+              >
+                {copied ? t("copied") : t("copyLink")}
+              </button>
+            </>
           )}
           <button
             onClick={togglePublish}

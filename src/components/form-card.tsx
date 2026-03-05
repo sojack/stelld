@@ -23,7 +23,7 @@ export function FormCard({
     <div className="bg-white border rounded-lg p-5 hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between">
         <div>
-          <Link href={`/builder/${id}`} className="text-base font-semibold text-gray-900 hover:underline">
+          <Link href={`/builder/${id}`} className="text-base font-semibold text-gray-900 hover:underline block truncate max-w-md">
             {title}
           </Link>
           <div className="flex items-center gap-4 mt-2 text-sm">
