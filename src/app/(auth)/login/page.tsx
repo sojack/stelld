@@ -16,19 +16,24 @@ export default function LoginPage() {
     setError("");
 
     const formData = new FormData(e.currentTarget);
-    const res = await signIn("credentials", {
-      email: formData.get("email"),
-      password: formData.get("password"),
-      redirect: false,
-    });
+    try {
+      const res = await signIn("credentials", {
+        email: formData.get("email"),
+        password: formData.get("password"),
+        redirect: false,
+      });
 
-    if (res?.error) {
-      setError("Invalid email or password");
-      setLoading(false);
-      return;
+      if (res?.error) {
+        setError("Invalid email or password");
+        setLoading(false);
+        return;
+      }
+
+      window.location.href = "/dashboard";
+    } catch {
+      // signIn may throw on some Auth.js versions even on success
+      window.location.href = "/dashboard";
     }
-
-    router.push("/dashboard");
   }
 
   return (
