@@ -21,6 +21,8 @@ export default async function PublicFormPage({
     <FormRenderer
       formId={form.id}
       schema={form.schema as object}
+      title={form.title}
+      description={form.description ?? ""}
       thankYouMessage={settings.thankYouMessage}
       locale={locale}
     />
