@@ -131,7 +131,9 @@
     "saveFailed": "Échec de l'enregistrement",
     "emptyFormError": "Ajoutez au moins un champ avant de publier",
     "copyLink": "Copier le lien",
-    "copied": "Copié!"
+    "copied": "Copié!",
+    "description": "Description",
+    "descriptionPlaceholder": "Ajouter une description..."
   },
   "renderer": {
     "thankYou": "Merci!",

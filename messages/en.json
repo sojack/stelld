@@ -131,7 +131,9 @@
     "saveFailed": "Save failed",
     "emptyFormError": "Add at least one field before publishing",
     "copyLink": "Copy link",
-    "copied": "Copied!"
+    "copied": "Copied!",
+    "description": "Description",
+    "descriptionPlaceholder": "Add a description..."
   },
   "renderer": {
     "thankYou": "Thank you!",

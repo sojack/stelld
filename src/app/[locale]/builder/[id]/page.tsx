@@ -24,6 +24,7 @@ export default async function BuilderPage({
       formId={form.id}
       initialSchema={form.schema as object}
       initialTitle={form.title}
+      initialDescription={form.description ?? ""}
       isPublished={form.isPublished}
       locale={locale}
     />

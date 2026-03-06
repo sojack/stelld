@@ -12,6 +12,8 @@ import { LanguageSwitcher } from "./language-switcher";
 interface FormRendererProps {
   formId: string;
   schema: object;
+  title?: string;
+  description?: string;
   thankYouMessage?: string;
   locale: string;
 }
@@ -40,7 +42,7 @@ const THEME_OVERRIDES = {
   },
 };
 
-export function FormRenderer({ formId, schema, thankYouMessage, locale }: FormRendererProps) {
+export function FormRenderer({ formId, schema, title, description, thankYouMessage, locale }: FormRendererProps) {
   const t = useTranslations("renderer");
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
@@ -143,6 +145,12 @@ export function FormRenderer({ formId, schema, thankYouMessage, locale }: FormRe
         <LanguageSwitcher />
       </div>
       <div className="flex-1 max-w-3xl mx-auto w-full py-10">
+        {(title || description) && (
+          <div className="text-center mb-6 px-4">
+            {title && <h1 className="text-3xl font-bold text-gray-900 mb-2">{title}</h1>}
+            {description && <p className="text-gray-600">{description}</p>}
+          </div>
+        )}
         <Survey model={survey} />
       </div>
       <Footer />

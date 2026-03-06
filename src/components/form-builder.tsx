@@ -27,6 +27,7 @@ interface FormBuilderProps {
   formId: string;
   initialSchema: object;
   initialTitle: string;
+  initialDescription: string;
   isPublished: boolean;
   locale: string;
 }
@@ -43,9 +44,10 @@ function toSurveyJson(fields: FormField[]): object {
   return { pages: [{ elements }] };
 }
 
-export function FormBuilder({ formId, initialSchema, initialTitle, isPublished, locale }: FormBuilderProps) {
+export function FormBuilder({ formId, initialSchema, initialTitle, initialDescription, isPublished, locale }: FormBuilderProps) {
   const t = useTranslations("builder");
   const [title, setTitle] = useState(initialTitle);
+  const [description, setDescription] = useState(initialDescription);
   const [published, setPublished] = useState(isPublished);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState(false);
@@ -86,7 +88,7 @@ export function FormBuilder({ formId, initialSchema, initialTitle, isPublished, 
       const res = await fetch(`/api/forms/${formId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, schema }),
+        body: JSON.stringify({ title, description, schema }),
       });
       if (!res.ok) {
         setSaveError(true);
@@ -97,7 +99,7 @@ export function FormBuilder({ formId, initialSchema, initialTitle, isPublished, 
       setSaveError(true);
     }
     setSaving(false);
-  }, [formId, title, fields]);
+  }, [formId, title, description, fields]);
 
   function updateFields(newFields: FormField[]) {
     setFields(newFields);
@@ -262,7 +264,34 @@ export function FormBuilder({ formId, initialSchema, initialTitle, isPublished, 
               if (e.target === e.currentTarget) setSelectedId(null);
             }}
           >
-            <div className="max-w-2xl mx-auto">
+            <div className="max-w-2xl mx-auto space-y-4">
+              {/* Form title & description header */}
+              <div className="bg-white rounded-lg border p-5">
+                <input
+                  type="text"
+                  value={title}
+                  onChange={(e) => {
+                    setTitle(e.target.value);
+                    scheduleAutoSave(fields);
+                  }}
+                  onBlur={() => saveForm()}
+                  maxLength={200}
+                  placeholder={t("label")}
+                  className="w-full text-2xl font-bold text-gray-900 border-none outline-none placeholder-gray-300 mb-2"
+                />
+                <textarea
+                  value={description}
+                  onChange={(e) => {
+                    setDescription(e.target.value);
+                    scheduleAutoSave(fields);
+                  }}
+                  onBlur={() => saveForm()}
+                  rows={2}
+                  placeholder={t("descriptionPlaceholder")}
+                  className="w-full text-sm text-gray-600 border-none outline-none placeholder-gray-300 resize-none"
+                />
+              </div>
+
               {fields.length === 0 ? (
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center text-gray-400">
                   <p className="text-lg mb-1">{t("dragFieldsHere")}</p>
