@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 import "survey-core/survey-core.min.css";
 import "./form-renderer.css";
 import { Footer } from "./footer";
+import { LanguageSwitcher } from "./language-switcher";
 
 interface FormRendererProps {
   formId: string;
@@ -138,6 +139,9 @@ export function FormRenderer({ formId, schema, thankYouMessage, locale }: FormRe
         autoComplete="off"
         aria-hidden="true"
       />
+      <div className="flex justify-end max-w-3xl mx-auto w-full pt-4 px-4">
+        <LanguageSwitcher />
+      </div>
       <div className="flex-1 max-w-3xl mx-auto w-full py-10">
         <Survey model={survey} />
       </div>
