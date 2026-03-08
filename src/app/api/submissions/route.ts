@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { sendSubmissionNotification } from "@/lib/email";
+import { getPlanLimits } from "@/lib/plans";
 import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { createRateLimiter } from "@/lib/rate-limit";
@@ -40,6 +41,19 @@ export async function POST(req: Request) {
 
   if (!form) {
     return NextResponse.json({ error: "Form not found" }, { status: 404 });
+  }
+
+  const subscription = await prisma.subscription.findUnique({
+    where: { userId: form.userId },
+  });
+  const limits = getPlanLimits(subscription?.plan);
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const submissionCount = await prisma.submission.count({
+    where: { formId: form.id, createdAt: { gte: monthStart } },
+  });
+  if (submissionCount >= limits.maxSubmissionsPerMonth) {
+    return NextResponse.json({ error: "SUBMISSION_LIMIT_REACHED" }, { status: 403 });
   }
 
   const submission = await prisma.submission.create({

@@ -138,7 +138,8 @@
   "renderer": {
     "thankYou": "Merci!",
     "defaultThankYou": "Merci pour votre soumission!",
-    "submitError": "Une erreur est survenue. Veuillez réessayer."
+    "submitError": "Une erreur est survenue. Veuillez réessayer.",
+    "submissionLimitReached": "Ce formulaire n'accepte pas de réponses pour le moment."
   },
   "submissions": {
     "title": "Détail de la soumission",
@@ -159,5 +160,38 @@
   "metadata": {
     "title": "Stelld — Créateur de formulaires canadien",
     "description": "Un créateur de formulaires axé sur la confidentialité pour les entreprises canadiennes. Toutes les données sont stockées sur des serveurs canadiens."
+  },
+  "billing": {
+    "title": "Facturation",
+    "currentPlan": "Forfait actuel",
+    "free": "Gratuit",
+    "pro": "Pro",
+    "business": "Affaires",
+    "perMonth": "/mois",
+    "perYear": "/an",
+    "upgrade": "Mettre à niveau",
+    "upgradeToPro": "Passer au Pro",
+    "upgradeToBusiness": "Passer au Affaires",
+    "manageBilling": "Gérer la facturation",
+    "monthly": "Mensuel",
+    "yearly": "Annuel",
+    "savePercent": "Économisez ~17%",
+    "formsUsed": "{used} / {limit} formulaires",
+    "formsUsedUnlimited": "{used} formulaires (illimité)",
+    "submissionsUsed": "{used} / {limit} soumissions ce mois-ci",
+    "usage": "Utilisation",
+    "cancelAtPeriodEnd": "Annulation à la fin de la période",
+    "pastDue": "Paiement en retard",
+    "upgradePrompt": "Passez à un forfait supérieur pour plus de formulaires et de soumissions",
+    "formLimitReached": "Vous avez atteint votre limite de formulaires. Passez à un forfait supérieur pour en créer davantage.",
+    "submissionLimitReached": "Ce formulaire n'accepte pas de réponses pour le moment.",
+    "connectStripe": "Connecter un compte Stripe",
+    "stripeConnected": "Stripe connecté",
+    "payoutsEnabled": "Paiements activés",
+    "onboardingIncomplete": "Compléter l'intégration Stripe",
+    "paymentField": "Paiement",
+    "businessOnly": "Forfait Affaires",
+    "success": "Abonnement activé!",
+    "canceled": "Paiement annulé"
   }
 }

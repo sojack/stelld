@@ -138,7 +138,8 @@
   "renderer": {
     "thankYou": "Thank you!",
     "defaultThankYou": "Thank you for your submission!",
-    "submitError": "Something went wrong. Please try again."
+    "submitError": "Something went wrong. Please try again.",
+    "submissionLimitReached": "This form is not currently accepting responses."
   },
   "submissions": {
     "title": "Submission Detail",
@@ -159,5 +160,38 @@
   "metadata": {
     "title": "Stelld — Simple Canadian Form Builder",
     "description": "A privacy-first form builder for Canadian businesses. All data stored on Canadian servers."
+  },
+  "billing": {
+    "title": "Billing",
+    "currentPlan": "Current Plan",
+    "free": "Free",
+    "pro": "Pro",
+    "business": "Business",
+    "perMonth": "/month",
+    "perYear": "/year",
+    "upgrade": "Upgrade",
+    "upgradeToPro": "Upgrade to Pro",
+    "upgradeToBusiness": "Upgrade to Business",
+    "manageBilling": "Manage Billing",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "savePercent": "Save ~17%",
+    "formsUsed": "{used} / {limit} forms",
+    "formsUsedUnlimited": "{used} forms (unlimited)",
+    "submissionsUsed": "{used} / {limit} submissions this month",
+    "usage": "Usage",
+    "cancelAtPeriodEnd": "Cancels at end of period",
+    "pastDue": "Payment past due",
+    "upgradePrompt": "Upgrade for more forms and submissions",
+    "formLimitReached": "You've reached your form limit. Upgrade your plan to create more forms.",
+    "submissionLimitReached": "This form is not currently accepting responses.",
+    "connectStripe": "Connect Stripe Account",
+    "stripeConnected": "Stripe connected",
+    "payoutsEnabled": "Payouts enabled",
+    "onboardingIncomplete": "Complete Stripe onboarding",
+    "paymentField": "Payment",
+    "businessOnly": "Business plan",
+    "success": "Subscription activated!",
+    "canceled": "Checkout canceled"
   }
 }

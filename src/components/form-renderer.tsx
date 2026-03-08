@@ -75,6 +75,10 @@ export function FormRenderer({ formId, schema, title, description, thankYouMessa
         }),
       });
 
+      if (res.status === 403) {
+        setError(t("submissionLimitReached"));
+        return;
+      }
       if (!res.ok) {
         setError(t("submitError"));
         return;
