@@ -24,6 +24,9 @@ model User {
   sessions Session[]
   forms    Form[]
 
+  subscription  Subscription?
+  stripeConnect StripeConnect?
+
   @@map("users")
 }
 
@@ -99,4 +102,50 @@ model Submission {
   @@index([formId])
   @@index([createdAt])
   @@map("submissions")
+}
+
+// ---- Stripe / Subscription tables ----
+
+enum Plan {
+  FREE
+  PRO
+  BUSINESS
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  TRIALING
+}
+
+model Subscription {
+  id                   String             @id @default(uuid())
+  userId               String             @unique
+  stripeCustomerId     String             @unique
+  stripeSubscriptionId String?            @unique
+  plan                 Plan               @default(FREE)
+  status               SubscriptionStatus @default(ACTIVE)
+  currentPeriodEnd     DateTime?
+  cancelAtPeriodEnd    Boolean            @default(false)
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("subscriptions")
+}
+
+model StripeConnect {
+  id                 String   @id @default(uuid())
+  userId             String   @unique
+  stripeAccountId    String   @unique
+  onboardingComplete Boolean  @default(false)
+  payoutsEnabled     Boolean  @default(false)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("stripe_connects")
 }
