@@ -133,7 +133,12 @@
     "copyLink": "Copier le lien",
     "copied": "Copié!",
     "description": "Description",
-    "descriptionPlaceholder": "Ajouter une description..."
+    "descriptionPlaceholder": "Ajouter une description...",
+    "fieldPayment": "Paiement",
+    "businessOnly": "Forfait Affaires",
+    "paymentAmount": "Montant",
+    "paymentCurrency": "Devise",
+    "paymentDescription": "Description du paiement"
   },
   "renderer": {
     "thankYou": "Merci!",

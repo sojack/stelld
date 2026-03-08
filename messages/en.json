@@ -133,7 +133,12 @@
     "copyLink": "Copy link",
     "copied": "Copied!",
     "description": "Description",
-    "descriptionPlaceholder": "Add a description..."
+    "descriptionPlaceholder": "Add a description...",
+    "fieldPayment": "Payment",
+    "businessOnly": "Business plan",
+    "paymentAmount": "Amount",
+    "paymentCurrency": "Currency",
+    "paymentDescription": "Payment description"
   },
   "renderer": {
     "thankYou": "Thank you!",

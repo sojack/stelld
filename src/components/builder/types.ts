@@ -11,4 +11,7 @@ export interface FormField {
   choices?: (string | LocalizedString)[];
   min?: number;
   max?: number;
+  paymentAmount?: number;
+  paymentCurrency?: "CAD" | "USD";
+  paymentDescription?: string;
 }

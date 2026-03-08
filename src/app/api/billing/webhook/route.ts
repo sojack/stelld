@@ -87,6 +87,23 @@ export async function POST(req: Request) {
           },
         });
       }
+
+      // Handle payment mode (form payment collection)
+      if (session.mode === "payment" && session.metadata?.formId) {
+        const data = JSON.parse(session.metadata.submissionData || "{}");
+        await prisma.submission.create({
+          data: {
+            formId: session.metadata.formId,
+            data,
+            metadata: {
+              paymentId: typeof session.payment_intent === "string" ? session.payment_intent : session.payment_intent?.id,
+              paidAmount: session.amount_total,
+              paidCurrency: session.currency,
+              submittedAt: new Date().toISOString(),
+            },
+          },
+        });
+      }
       break;
     }
 

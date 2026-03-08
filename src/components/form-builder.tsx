@@ -30,6 +30,7 @@ interface FormBuilderProps {
   initialDescription: string;
   isPublished: boolean;
   locale: string;
+  plan?: string;
 }
 
 function parseSchema(schema: object): FormField[] {
@@ -44,7 +45,7 @@ function toSurveyJson(fields: FormField[]): object {
   return { pages: [{ elements }] };
 }
 
-export function FormBuilder({ formId, initialSchema, initialTitle, initialDescription, isPublished, locale }: FormBuilderProps) {
+export function FormBuilder({ formId, initialSchema, initialTitle, initialDescription, isPublished, locale, plan }: FormBuilderProps) {
   const t = useTranslations("builder");
   const [title, setTitle] = useState(initialTitle);
   const [description, setDescription] = useState(initialDescription);
@@ -118,6 +119,7 @@ export function FormBuilder({ formId, initialSchema, initialTitle, initialDescri
       isRequired: false,
       ...(fieldType.inputType && { inputType: fieldType.inputType }),
       ...(fieldType.hasChoices && { choices: [t("defaultOption", { number: 1 }), t("defaultOption", { number: 2 }), t("defaultOption", { number: 3 })] }),
+      ...(fieldType.isPayment && { paymentAmount: 0, paymentCurrency: "CAD" as const, paymentDescription: "" }),
     };
     const newFields = [...fields, newField];
     updateFields(newFields);
@@ -254,7 +256,7 @@ export function FormBuilder({ formId, initialSchema, initialTitle, initialDescri
           {/* Left: Field Palette */}
           <div className="w-[200px] bg-white border-r p-3 overflow-y-auto">
             <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">{t("fields")}</h3>
-            <FieldPalette onAddField={addField} />
+            <FieldPalette onAddField={addField} plan={plan} />
           </div>
 
           {/* Center: Canvas */}

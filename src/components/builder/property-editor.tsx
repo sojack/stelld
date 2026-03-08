@@ -46,6 +46,7 @@ export function PropertyEditor({ field, onChange }: PropertyEditorProps) {
   const hasChoices = field.type === "dropdown" || field.type === "checkbox" || field.type === "radiogroup";
   const hasPlaceholder = field.type === "text" || field.type === "comment";
   const isNumber = field.inputType === "number";
+  const isPayment = field.type === "expression" && field.paymentAmount !== undefined;
 
   const titleDefault = getDefaultString(field.title);
   const titleFr = getFrenchString(field.title);
@@ -218,6 +219,43 @@ export function PropertyEditor({ field, onChange }: PropertyEditorProps) {
             {t("addOption")}
           </button>
         </div>
+      )}
+
+      {/* Payment properties */}
+      {isPayment && (
+        <>
+          <div>
+            <label className="block text-sm font-medium text-gray-900 mb-1">{t("paymentAmount")}</label>
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              value={field.paymentAmount ?? ""}
+              onChange={(e) => onChange({ paymentAmount: e.target.value ? Number(e.target.value) : undefined })}
+              className="w-full border rounded px-3 py-1.5 text-sm text-gray-900"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-900 mb-1">{t("paymentCurrency")}</label>
+            <select
+              value={field.paymentCurrency ?? "CAD"}
+              onChange={(e) => onChange({ paymentCurrency: e.target.value as "CAD" | "USD" })}
+              className="w-full border rounded px-3 py-1.5 text-sm text-gray-900"
+            >
+              <option value="CAD">CAD</option>
+              <option value="USD">USD</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-900 mb-1">{t("paymentDescription")}</label>
+            <input
+              type="text"
+              value={field.paymentDescription ?? ""}
+              onChange={(e) => onChange({ paymentDescription: e.target.value })}
+              className="w-full border rounded px-3 py-1.5 text-sm text-gray-900"
+            />
+          </div>
+        </>
       )}
 
       {/* Translations section */}
