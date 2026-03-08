@@ -13,9 +13,14 @@ export default async function BuilderPage({
   const session = await auth();
   if (!session?.user?.id) redirect({ href: "/login", locale: locale as "en" | "fr" });
 
-  const form = await prisma.form.findFirst({
-    where: { id, userId: session!.user!.id },
-  });
+  const [form, subscription] = await Promise.all([
+    prisma.form.findFirst({
+      where: { id, userId: session!.user!.id },
+    }),
+    prisma.subscription.findUnique({
+      where: { userId: session!.user!.id },
+    }),
+  ]);
 
   if (!form) notFound();
 
@@ -27,6 +32,7 @@ export default async function BuilderPage({
       initialDescription={form.description ?? ""}
       isPublished={form.isPublished}
       locale={locale}
+      plan={subscription?.plan ?? "FREE"}
     />
   );
 }

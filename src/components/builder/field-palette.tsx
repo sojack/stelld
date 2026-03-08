@@ -12,7 +12,8 @@ export type FieldTypeId =
   | "dropdown"
   | "checkbox"
   | "radio"
-  | "date";
+  | "date"
+  | "payment";
 
 export interface FieldType {
   id: FieldTypeId;
@@ -21,6 +22,7 @@ export interface FieldType {
   surveyType: string;
   inputType?: string;
   hasChoices?: boolean;
+  isPayment?: boolean;
   label: string; // resolved at render time
 }
 
@@ -34,6 +36,7 @@ const FIELD_TYPE_DEFS: Omit<FieldType, "label">[] = [
   { id: "checkbox", labelKey: "fieldCheckbox", icon: "☑", surveyType: "checkbox", hasChoices: true },
   { id: "radio", labelKey: "fieldRadio", icon: "◉", surveyType: "radiogroup", hasChoices: true },
   { id: "date", labelKey: "fieldDate", icon: "📅", surveyType: "text", inputType: "date" },
+  { id: "payment", labelKey: "fieldPayment", icon: "$", surveyType: "expression", isPayment: true },
 ];
 
 // Exported for use in form-builder (addField needs label + surveyType etc.)
@@ -65,9 +68,10 @@ function PaletteItem({ type, onAdd }: { type: FieldType; onAdd: () => void }) {
 
 interface FieldPaletteProps {
   onAddField: (typeId: FieldTypeId) => void;
+  plan?: string;
 }
 
-export function FieldPalette({ onAddField }: FieldPaletteProps) {
+export function FieldPalette({ onAddField, plan }: FieldPaletteProps) {
   const t = useTranslations("builder");
 
   // Resolve translated labels
@@ -81,9 +85,23 @@ export function FieldPalette({ onAddField }: FieldPaletteProps) {
 
   return (
     <div className="space-y-0.5">
-      {translatedTypes.map((type) => (
-        <PaletteItem key={type.id} type={type} onAdd={() => onAddField(type.id)} />
-      ))}
+      {translatedTypes.map((type) => {
+        if (type.isPayment && plan !== "BUSINESS") {
+          return (
+            <div
+              key={type.id}
+              className="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm rounded-md opacity-50 cursor-not-allowed"
+            >
+              <span className="w-7 h-7 flex items-center justify-center rounded bg-gray-100 text-gray-400 font-mono text-xs shrink-0">{type.icon}</span>
+              <span className="text-gray-400 font-medium">{type.label}</span>
+              <span className="ml-auto text-xs text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">{t("businessOnly")}</span>
+            </div>
+          );
+        }
+        return (
+          <PaletteItem key={type.id} type={type} onAdd={() => onAddField(type.id)} />
+        );
+      })}
     </div>
   );
 }

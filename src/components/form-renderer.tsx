@@ -63,8 +63,30 @@ export function FormRenderer({ formId, schema, title, description, thankYouMessa
     survey.locale = locale;
   }, [survey, locale]);
 
+  // Check if form has a payment field
+  const hasPayment = (() => {
+    const s = schema as { pages?: { elements?: Array<{ type: string; paymentAmount?: number }> }[] };
+    return s?.pages?.[0]?.elements?.some((el) => el.type === "expression" && el.paymentAmount) ?? false;
+  })();
+
   useEffect(() => {
     const handler = async (sender: Model) => {
+      // If form has payment, redirect to Stripe Checkout instead of submitting directly
+      if (hasPayment) {
+        const res = await fetch("/api/billing/payment-session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ formId, data: sender.data, locale }),
+        });
+        const { url } = await res.json();
+        if (url) {
+          window.location.href = url;
+          return;
+        }
+        setError(t("submitError"));
+        return;
+      }
+
       const res = await fetch("/api/submissions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -89,7 +111,7 @@ export function FormRenderer({ formId, schema, title, description, thankYouMessa
 
     survey.onComplete.add(handler);
     return () => { survey.onComplete.remove(handler); };
-  }, [survey, formId, t]);
+  }, [survey, formId, t, hasPayment, locale]);
 
   useEffect(() => {
     const container = containerRef.current;

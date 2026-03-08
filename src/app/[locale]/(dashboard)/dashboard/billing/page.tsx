@@ -28,6 +28,7 @@ export default function BillingPage() {
   const [billing, setBilling] = useState<BillingStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
+  const [connect, setConnect] = useState<{ connected: boolean; onboardingComplete?: boolean; payoutsEnabled?: boolean } | null>(null);
 
   const result = searchParams.get("result");
 
@@ -38,6 +39,7 @@ export default function BillingPage() {
         setBilling(data);
         setLoading(false);
       });
+    fetch("/api/billing/connect").then((r) => r.json()).then(setConnect);
   }, []);
 
   async function handleCheckout(priceKey: string) {
@@ -45,6 +47,16 @@ export default function BillingPage() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ priceKey, locale }),
+    });
+    const { url } = await res.json();
+    if (url) window.location.href = url;
+  }
+
+  async function handleConnect() {
+    const res = await fetch("/api/billing/connect", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ locale }),
     });
     const { url } = await res.json();
     if (url) window.location.href = url;
@@ -146,6 +158,36 @@ export default function BillingPage() {
           </div>
         </div>
       </div>
+
+      {/* Stripe Connect (Business only) */}
+      {billing.plan === "BUSINESS" && connect && (
+        <div className="bg-white rounded-lg border p-6 mb-6">
+          <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-4">{t("paymentField")}</h2>
+          {connect.connected && connect.onboardingComplete ? (
+            <div className="flex items-center gap-2">
+              <span className="inline-block w-2 h-2 rounded-full bg-green-500" />
+              <span className="text-sm text-gray-700">{t("stripeConnected")} — {t("payoutsEnabled")}</span>
+            </div>
+          ) : connect.connected ? (
+            <div>
+              <p className="text-sm text-yellow-700 mb-3">{t("onboardingIncomplete")}</p>
+              <button
+                onClick={handleConnect}
+                className="text-sm font-medium text-green-600 hover:underline"
+              >
+                {t("onboardingIncomplete")}
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={handleConnect}
+              className="bg-green-600 text-white font-medium px-5 py-2 rounded-md hover:bg-green-700 transition-colors"
+            >
+              {t("connectStripe")}
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Upgrade Cards (Free plan only) */}
       {isFreePlan && (
