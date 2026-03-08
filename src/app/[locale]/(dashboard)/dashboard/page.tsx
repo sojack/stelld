@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { useRouter } from "@/i18n/routing";
+import { useRouter, Link } from "@/i18n/routing";
 import { FormCard } from "@/components/form-card";
 
 interface Form {
@@ -16,14 +16,17 @@ interface Form {
 export default function DashboardPage() {
   const t = useTranslations("dashboard");
   const tc = useTranslations("common");
+  const tb = useTranslations("billing");
   const router = useRouter();
   const [forms, setForms] = useState<Form[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState("");
+  const [billing, setBilling] = useState<{ plan: string; limits: { maxForms: number }; usage: { forms: number } } | null>(null);
 
   useEffect(() => {
     fetchForms();
+    fetch("/api/billing/status").then(r => r.json()).then(setBilling);
   }, []);
 
   async function fetchForms() {
@@ -43,6 +46,11 @@ export default function DashboardPage() {
     setError("");
     try {
       const res = await fetch("/api/forms", { method: "POST" });
+      if (res.status === 403) {
+        setError(tb("formLimitReached"));
+        setCreating(false);
+        return;
+      }
       const form = await res.json();
       router.push(`/builder/${form.id}`);
     } catch {
@@ -86,6 +94,16 @@ export default function DashboardPage() {
           {creating ? t("creating") : t("newForm")}
         </button>
       </div>
+      {billing && billing.limits.maxForms < 999999 && (
+        <p className="text-sm text-gray-500 mb-4">
+          {tb("formsUsed", { used: billing.usage.forms, limit: billing.limits.maxForms })}
+          {billing.usage.forms >= billing.limits.maxForms && (
+            <Link href="/dashboard/billing" className="ml-2 text-green-600 hover:underline">
+              {tb("upgrade")}
+            </Link>
+          )}
+        </p>
+      )}
       {error && <p className="text-red-600 font-medium mb-4">{error}</p>}
       {forms.length === 0 ? (
         <div className="text-center py-16 text-gray-500">
