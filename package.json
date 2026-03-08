@@ -23,6 +23,7 @@
     "prisma": "^6.19.2",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "stripe": "^20.4.1",
     "survey-core": "^2.5.13",
     "survey-react-ui": "^2.5.13",
     "uuid": "^13.0.0"
