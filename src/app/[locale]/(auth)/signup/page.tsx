@@ -29,12 +29,13 @@ export default function SignupPage() {
     });
 
     if (!res.ok) {
-      const data = await res.json();
+      let data: { error?: string } = {};
+      try { data = await res.json(); } catch { /* empty body */ }
       const apiErrors: Record<string, string> = {
         "Email already in use": t("emailInUse"),
         "Email and password are required": t("emailAndPasswordRequired"),
       };
-      setError(apiErrors[data.error] || data.error || tc("error"));
+      setError(apiErrors[data.error ?? ""] || data.error || tc("error"));
       setLoading(false);
       return;
     }
