@@ -44,13 +44,14 @@ function ResetPasswordForm() {
     });
 
     if (!res.ok) {
-      const data = await res.json();
+      let data: { error?: string } = {};
+      try { data = await res.json(); } catch { /* empty body */ }
       const apiErrors: Record<string, string> = {
         "Invalid or expired token": t("invalidOrExpiredToken"),
         "Token and password are required": t("tokenAndPasswordRequired"),
         "Password must be at least 8 characters": t("passwordMinLength"),
       };
-      setError(apiErrors[data.error] || data.error || tc("error"));
+      setError(apiErrors[data.error ?? ""] || data.error || tc("error"));
       setLoading(false);
       return;
     }
