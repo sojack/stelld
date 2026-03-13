@@ -49,12 +49,19 @@ export async function POST(req: Request) {
   const sig = req.headers.get("stripe-signature")!;
 
   let event: Stripe.Event;
+  // Try signature verification first; if ALB modifies the body, fall back to
+  // parsing the event directly and verifying via the Stripe API.
   try {
     event = await stripe.webhooks.constructEventAsync(body, sig, process.env.STRIPE_WEBHOOK_SECRET!);
-  } catch (err) {
-    console.error("Webhook signature verification failed:", (err as Error).message);
-    console.error("Body length:", body.length, "Sig:", sig?.slice(0, 30));
-    return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
+  } catch {
+    // Fallback: parse the body and retrieve the event from Stripe to confirm authenticity
+    try {
+      const parsed = JSON.parse(body);
+      event = await stripe.events.retrieve(parsed.id);
+    } catch (err2) {
+      console.error("Webhook verification failed:", (err2 as Error).message);
+      return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
+    }
   }
 
   switch (event.type) {
