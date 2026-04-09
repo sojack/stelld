@@ -188,7 +188,7 @@ export function FormBuilder({ formId, initialSchema, initialTitle, initialDescri
   }
 
   async function copyLink() {
-    const url = `${window.location.origin}/${locale}/f/${formId}`;
+    const url = `${window.location.origin}/${locale}/f/${slug ?? formId}`;
     await navigator.clipboard.writeText(url);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -226,7 +226,7 @@ export function FormBuilder({ formId, initialSchema, initialTitle, initialDescri
           {published && (
             <>
               <a
-                href={`/${locale}/f/${formId}`}
+                href={`/${locale}/f/${slug ?? formId}`}
                 target="_blank"
                 className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline"
               >
@@ -357,6 +357,7 @@ export function FormBuilder({ formId, initialSchema, initialTitle, initialDescri
                   currentSlug={slug}
                   canCustomize={plan === "PRO" || plan === "BUSINESS"}
                   onSlugChange={(newSlug) => setSlug(newSlug ?? undefined)}
+                  locale={locale}
                 />
                 <p className="text-xs text-gray-400 text-center pt-4">{t("selectFieldHint")}</p>
               </div>

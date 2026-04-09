@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db";
 import { notFound } from "next/navigation";
-import { permanentRedirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import { FormRenderer } from "@/components/form-renderer";
 
 export default async function PublicFormPage({
@@ -25,7 +25,7 @@ export default async function PublicFormPage({
 
     // If accessed by UUID but form has a slug, redirect permanently
     if (form.slug) {
-      permanentRedirect(`/${locale}/f/${form.slug}`);
+      redirect(`/${locale}/f/${form.slug}`);
     }
   }
 

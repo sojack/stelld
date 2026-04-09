@@ -1,17 +1,17 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { SLUG_REGEX, SLUG_MIN, SLUG_MAX } from "@/lib/slug";
 
 interface SlugInputProps {
   formId: string;
   currentSlug: string | undefined;
   onSlugChange: (slug: string | null) => void;
   canCustomize: boolean;
+  locale: string;
 }
 
-const SLUG_REGEX = /^[a-z0-9-]+$/;
-
-export function SlugInput({ formId, currentSlug, onSlugChange, canCustomize }: SlugInputProps) {
+export function SlugInput({ formId, currentSlug, onSlugChange, canCustomize, locale }: SlugInputProps) {
   const [value, setValue] = useState(currentSlug ?? "");
   const [status, setStatus] = useState<"idle" | "checking" | "available" | "taken" | "invalid">("idle");
   const [errorMsg, setErrorMsg] = useState("");
@@ -24,7 +24,7 @@ export function SlugInput({ formId, currentSlug, onSlugChange, canCustomize }: S
         <p className="text-xs text-gray-500 mb-1">Custom URL</p>
         <p className="text-xs text-gray-400">
           Available on{" "}
-          <a href="/en/dashboard/billing" className="text-green-700 underline">
+          <a href={`/${locale}/dashboard/billing`} className="text-green-700 underline">
             PRO plan
           </a>
         </p>
@@ -53,9 +53,9 @@ export function SlugInput({ formId, currentSlug, onSlugChange, canCustomize }: S
     }
 
     // Client-side format check
-    if (slug.length < 3 || slug.length > 60 || !SLUG_REGEX.test(slug)) {
+    if (slug.length < SLUG_MIN || slug.length > SLUG_MAX || !SLUG_REGEX.test(slug)) {
       setStatus("invalid");
-      setErrorMsg("Use only lowercase letters, numbers, and hyphens (3–60 characters)");
+      setErrorMsg("Use only lowercase letters, numbers, and hyphens (3–60 characters, no leading/trailing hyphens)");
       return;
     }
 
@@ -109,11 +109,13 @@ export function SlugInput({ formId, currentSlug, onSlugChange, canCustomize }: S
     setValue("");
     setStatus("idle");
     setErrorMsg("");
+    setSaving(true);
     await fetch(`/api/forms/${formId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ slug: null }),
     });
+    setSaving(false);
     onSlugChange(null);
   }
 
@@ -150,7 +152,7 @@ export function SlugInput({ formId, currentSlug, onSlugChange, canCustomize }: S
       </div>
 
       <p className="text-xs text-gray-400">
-        stelld.ca/en/f/<span className="text-gray-600">{displaySlug}</span>
+        stelld.ca/{locale}/f/<span className="text-gray-600">{displaySlug}</span>
       </p>
 
       {status === "checking" && (

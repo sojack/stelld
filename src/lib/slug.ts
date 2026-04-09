@@ -1,4 +1,5 @@
-export const SLUG_REGEX = /^[a-z0-9-]+$/;
+// Must start and end with alphanumeric; hyphens only in the middle
+export const SLUG_REGEX = /^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$/;
 export const SLUG_MIN = 3;
 export const SLUG_MAX = 60;
 
