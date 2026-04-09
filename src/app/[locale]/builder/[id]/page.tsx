@@ -31,6 +31,7 @@ export default async function BuilderPage({
       initialTitle={form.title}
       initialDescription={form.description ?? ""}
       initialSettings={(form.settings as { bannerUrl?: string; thankYouMessage?: string }) ?? {}}
+      initialSlug={form.slug ?? undefined}
       isPublished={form.isPublished}
       locale={locale}
       plan={subscription?.plan ?? "FREE"}

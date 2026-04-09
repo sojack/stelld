@@ -22,6 +22,7 @@ import { FieldPalette, FIELD_TYPES, type FieldTypeId } from "./builder/field-pal
 import { CanvasField } from "./builder/canvas-field";
 import { PropertyEditor } from "./builder/property-editor";
 import { BannerUploader } from "./builder/banner-uploader";
+import { SlugInput } from "./builder/slug-input";
 import type { FormField } from "./builder/types";
 
 type FormSettings = { bannerUrl?: string; thankYouMessage?: string };
@@ -32,6 +33,7 @@ interface FormBuilderProps {
   initialTitle: string;
   initialDescription: string;
   initialSettings: FormSettings;
+  initialSlug: string | undefined;
   isPublished: boolean;
   locale: string;
   plan?: string;
@@ -49,7 +51,7 @@ function toSurveyJson(fields: FormField[]): object {
   return { pages: [{ elements }] };
 }
 
-export function FormBuilder({ formId, initialSchema, initialTitle, initialDescription, initialSettings, isPublished, locale, plan }: FormBuilderProps) {
+export function FormBuilder({ formId, initialSchema, initialTitle, initialDescription, initialSettings, initialSlug, isPublished, locale, plan }: FormBuilderProps) {
   const t = useTranslations("builder");
   const [title, setTitle] = useState(initialTitle);
   const [description, setDescription] = useState(initialDescription);
@@ -59,6 +61,7 @@ export function FormBuilder({ formId, initialSchema, initialTitle, initialDescri
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [fields, setFields] = useState<FormField[]>(() => parseSchema(initialSchema));
   const [settings, setSettings] = useState<FormSettings>(initialSettings);
+  const [slug, setSlug] = useState<string | undefined>(initialSlug);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [publishError, setPublishError] = useState("");
@@ -348,6 +351,12 @@ export function FormBuilder({ formId, initialSchema, initialTitle, initialDescri
                       body: JSON.stringify({ settings: next }),
                     });
                   }}
+                />
+                <SlugInput
+                  formId={formId}
+                  currentSlug={slug}
+                  canCustomize={plan === "PRO" || plan === "BUSINESS"}
+                  onSlugChange={(newSlug) => setSlug(newSlug ?? undefined)}
                 />
                 <p className="text-xs text-gray-400 text-center pt-4">{t("selectFieldHint")}</p>
               </div>
