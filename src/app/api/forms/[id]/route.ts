@@ -1,6 +1,8 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
+import { getPlanLimits } from "@/lib/plans";
+import { validateSlug } from "@/lib/slug";
 
 export async function GET(
   req: Request,
@@ -35,6 +37,46 @@ export async function PUT(
 
   const body = await req.json();
 
+  // Handle slug update
+  if (body.slug !== undefined) {
+    const subscription = await prisma.subscription.findUnique({
+      where: { userId: session.user.id },
+    });
+    const limits = getPlanLimits(subscription?.plan);
+    if (!limits.canCustomizeSlug) {
+      return NextResponse.json({ error: "Upgrade to PRO to use custom URLs" }, { status: 403 });
+    }
+
+    // null or empty string clears the slug
+    if (body.slug === null || body.slug === "") {
+      await prisma.form.updateMany({
+        where: { id, userId: session.user.id },
+        data: { slug: null },
+      });
+      return NextResponse.json({ success: true });
+    }
+
+    const validationError = validateSlug(body.slug);
+    if (validationError) {
+      return NextResponse.json({ error: validationError }, { status: 400 });
+    }
+
+    // Check uniqueness excluding this form
+    const existing = await prisma.form.findFirst({
+      where: { slug: body.slug, NOT: { id } },
+    });
+    if (existing) {
+      return NextResponse.json({ error: "This URL is already taken" }, { status: 409 });
+    }
+
+    await prisma.form.updateMany({
+      where: { id, userId: session.user.id },
+      data: { slug: body.slug },
+    });
+    return NextResponse.json({ success: true });
+  }
+
+  // Existing non-slug fields
   const form = await prisma.form.updateMany({
     where: { id, userId: session.user.id },
     data: {
