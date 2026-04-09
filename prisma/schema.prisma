@@ -77,6 +77,7 @@ model Form {
   userId      String
   title       String   @default("Untitled Form")
   description String?
+  slug        String?  @unique
   schema      Json     @default("{}")
   settings    Json     @default("{}")
   isPublished Boolean  @default(false)
