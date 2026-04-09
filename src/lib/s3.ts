@@ -2,7 +2,11 @@ import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { v4 as uuid } from "uuid";
 
-const s3 = new S3Client({ region: process.env.AWS_REGION ?? "ca-central-1" });
+const s3 = new S3Client({
+  region: process.env.AWS_REGION ?? "ca-central-1",
+  requestChecksumCalculation: "WHEN_REQUIRED",
+  responseChecksumValidation: "WHEN_REQUIRED",
+});
 
 const bucket = process.env.AWS_S3_BUCKET ?? "";
 
