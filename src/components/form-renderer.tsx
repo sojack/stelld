@@ -15,6 +15,7 @@ interface FormRendererProps {
   title?: string;
   description?: string;
   thankYouMessage?: string;
+  bannerUrl?: string;
   locale: string;
 }
 
@@ -42,7 +43,7 @@ const THEME_OVERRIDES = {
   },
 };
 
-export function FormRenderer({ formId, schema, title, description, thankYouMessage, locale }: FormRendererProps) {
+export function FormRenderer({ formId, schema, title, description, thankYouMessage, bannerUrl, locale }: FormRendererProps) {
   const t = useTranslations("renderer");
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
@@ -171,6 +172,12 @@ export function FormRenderer({ formId, schema, title, description, thankYouMessa
         <LanguageSwitcher />
       </div>
       <div className="flex-1 max-w-3xl mx-auto w-full py-10">
+        {bannerUrl && (
+          <div className="w-full aspect-[3/1] overflow-hidden rounded-lg mb-6">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={bannerUrl} alt="" className="w-full h-full object-cover" />
+          </div>
+        )}
         {(title || description) && (
           <div className="text-center mb-6 px-4">
             {title && <h1 className="text-3xl font-bold text-gray-900 mb-2">{title}</h1>}

@@ -17,9 +17,9 @@ See `docs/plans/2026-03-03-mvp-design.md` for the full approved design.
 - **Auth**: Auth.js v5 (self-hosted)
 - **ORM**: Prisma
 - **Database**: PostgreSQL 16 (RDS, ca-central-1)
-- **Email**: Amazon SES (ca-central-1)
+- **Email**: Resend (transactional — password resets, submission notifications)
 - **Styling**: Tailwind CSS
-- **Infrastructure**: AWS ca-central-1 — EC2 + ALB, RDS, SES, S3
+- **Infrastructure**: AWS ca-central-1 — EC2 + ALB, RDS, S3
 
 ## Architecture
 
@@ -65,14 +65,15 @@ No multi-tenant RLS — queries filter by `user_id`. The JSONB `schema` column s
 - Email notifications are simple "new response" alerts with a dashboard link
 - CSV export generates on-the-fly (no background jobs)
 - Data model is i18n-ready (SurveyJS supports localized strings in JSON) but MVP is English-only
+- See `docs/infrastructure.md` for deployment, Docker, and ops details
 
 ## Feature Roadmap
 
-1. **MVP**: Auth, form builder (SurveyJS Creator), public forms, submissions, email notifications, CSV export
-2. **Phase 2**: File uploads (S3), bilingual FR/EN
-3. **Phase 3**: Payments (Stripe/Helcim), subdomains, multi-user orgs
+1. **MVP**: Auth, form builder (SurveyJS Creator), public forms, submissions, email notifications, CSV export — **complete**
+2. **Phase 2**: File uploads (S3), bilingual FR/EN — **bilingual complete**
+3. **Phase 3**: Payments (Stripe/Helcim), subdomains, multi-user orgs — **Stripe integration complete**
 4. **Phase 4**: Audit logs, PIPEDA "Vault" mode, per-tenant encryption
 
 ## Project Status
 
-Greenfield — design approved, no code scaffolded yet.
+Deployed to production at stelld.ca. MVP features complete, bilingual (EN/FR) complete, Stripe payments complete (subscriptions + Connect + form payment collection).

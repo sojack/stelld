@@ -99,6 +99,7 @@
     "dragFieldsHere": "Glissez les champs ici",
     "dragFieldsHint": "ou cliquez sur un type de champ à gauche pour l'ajouter",
     "selectFieldHint": "Sélectionnez un champ pour modifier ses propriétés",
+    "formSettings": "Paramètres du formulaire",
     "properties": "Propriétés",
     "label": "Libellé",
     "fieldName": "Nom du champ",

@@ -99,6 +99,7 @@
     "dragFieldsHere": "Drag fields here",
     "dragFieldsHint": "or click a field type on the left to add it",
     "selectFieldHint": "Select a field to edit its properties",
+    "formSettings": "Form Settings",
     "properties": "Properties",
     "label": "Label",
     "fieldName": "Field name",

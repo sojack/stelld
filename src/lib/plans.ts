@@ -4,6 +4,7 @@ export interface PlanLimits {
   maxForms: number;
   maxSubmissionsPerMonth: number;
   canCollectPayments: boolean;
+  canUploadBanner: boolean;
   maxStorageMB: number;
 }
 
@@ -12,18 +13,21 @@ export const PLAN_LIMITS: Record<Plan, PlanLimits> = {
     maxForms: 5,
     maxSubmissionsPerMonth: 100,
     canCollectPayments: false,
+    canUploadBanner: false,
     maxStorageMB: 100,
   },
   PRO: {
     maxForms: 50,
     maxSubmissionsPerMonth: 1000,
     canCollectPayments: false,
+    canUploadBanner: true,
     maxStorageMB: 1024,
   },
   BUSINESS: {
     maxForms: Infinity,
     maxSubmissionsPerMonth: 10000,
     canCollectPayments: true,
+    canUploadBanner: true,
     maxStorageMB: 10240,
   },
 };

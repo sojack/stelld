@@ -21,13 +21,17 @@ import { useTranslations, useLocale } from "next-intl";
 import { FieldPalette, FIELD_TYPES, type FieldTypeId } from "./builder/field-palette";
 import { CanvasField } from "./builder/canvas-field";
 import { PropertyEditor } from "./builder/property-editor";
+import { BannerUploader } from "./builder/banner-uploader";
 import type { FormField } from "./builder/types";
+
+type FormSettings = { bannerUrl?: string; thankYouMessage?: string };
 
 interface FormBuilderProps {
   formId: string;
   initialSchema: object;
   initialTitle: string;
   initialDescription: string;
+  initialSettings: FormSettings;
   isPublished: boolean;
   locale: string;
   plan?: string;
@@ -45,7 +49,7 @@ function toSurveyJson(fields: FormField[]): object {
   return { pages: [{ elements }] };
 }
 
-export function FormBuilder({ formId, initialSchema, initialTitle, initialDescription, isPublished, locale, plan }: FormBuilderProps) {
+export function FormBuilder({ formId, initialSchema, initialTitle, initialDescription, initialSettings, isPublished, locale, plan }: FormBuilderProps) {
   const t = useTranslations("builder");
   const [title, setTitle] = useState(initialTitle);
   const [description, setDescription] = useState(initialDescription);
@@ -54,6 +58,7 @@ export function FormBuilder({ formId, initialSchema, initialTitle, initialDescri
   const [saveError, setSaveError] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [fields, setFields] = useState<FormField[]>(() => parseSchema(initialSchema));
+  const [settings, setSettings] = useState<FormSettings>(initialSettings);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [publishError, setPublishError] = useState("");
@@ -328,8 +333,23 @@ export function FormBuilder({ formId, initialSchema, initialTitle, initialDescri
                 onChange={(updates) => updateField(selectedField._id, updates)}
               />
             ) : (
-              <div className="text-sm text-gray-500 text-center pt-8">
-                {t("selectFieldHint")}
+              <div className="space-y-4">
+                <h3 className="text-xs font-semibold text-gray-500 uppercase">{t("formSettings")}</h3>
+                <BannerUploader
+                  formId={formId}
+                  bannerUrl={settings.bannerUrl}
+                  canUpload={plan === "PRO" || plan === "BUSINESS"}
+                  onBannerChange={(url) => {
+                    const next: FormSettings = { ...settings, bannerUrl: url ?? undefined };
+                    setSettings(next);
+                    fetch(`/api/forms/${formId}`, {
+                      method: "PUT",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ settings: next }),
+                    });
+                  }}
+                />
+                <p className="text-xs text-gray-400 text-center pt-4">{t("selectFieldHint")}</p>
               </div>
             )}
           </div>

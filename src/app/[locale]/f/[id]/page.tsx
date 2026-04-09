@@ -15,7 +15,7 @@ export default async function PublicFormPage({
 
   if (!form) notFound();
 
-  const settings = form.settings as { thankYouMessage?: string };
+  const settings = form.settings as { thankYouMessage?: string; bannerUrl?: string };
 
   return (
     <FormRenderer
@@ -24,6 +24,7 @@ export default async function PublicFormPage({
       title={form.title}
       description={form.description ?? ""}
       thankYouMessage={settings.thankYouMessage}
+      bannerUrl={settings.bannerUrl}
       locale={locale}
     />
   );
