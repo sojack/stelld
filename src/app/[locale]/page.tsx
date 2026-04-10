@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/routing";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { Footer } from "@/components/footer";
+import { PricingSection } from "@/components/home/pricing-section";
 
 export default async function HomePage() {
   const t = await getTranslations("home");
@@ -77,6 +78,9 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Pricing */}
+      <PricingSection />
 
       {/* Shakespeare Quote */}
       <section className="px-6 pb-20">
