@@ -2,6 +2,20 @@ import { prisma } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { redirect } from "next/navigation";
 import { FormRenderer } from "@/components/form-renderer";
+import type { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const form = await prisma.form.findFirst({
+    where: { OR: [{ slug: id }, { id }], isPublished: true },
+    select: { title: true },
+  });
+  return { title: form?.title ?? "Stelld" };
+}
 
 export default async function PublicFormPage({
   params,
