@@ -167,6 +167,13 @@
     "title": "Stelld — Créateur de formulaires canadien",
     "description": "Un créateur de formulaires axé sur la confidentialité pour les entreprises canadiennes. Toutes les données sont stockées sur des serveurs canadiens."
   },
+  "footer": {
+    "terms": "Conditions d'utilisation",
+    "privacy": "Politique de confidentialité",
+    "allRights": "Tous droits réservés.",
+    "agreeToTerms": "En créant un compte, vous acceptez nos",
+    "and": "et notre"
+  },
   "billing": {
     "title": "Facturation",
     "currentPlan": "Forfait actuel",

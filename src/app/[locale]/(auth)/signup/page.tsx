@@ -3,11 +3,13 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/routing";
+import { Footer } from "@/components/footer";
 import { LanguageSwitcher } from "@/components/language-switcher";
 
 export default function SignupPage() {
   const t = useTranslations("auth");
   const tc = useTranslations("common");
+  const tf = useTranslations("footer");
   const router = useRouter();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -69,6 +71,12 @@ export default function SignupPage() {
             <button type="submit" disabled={loading} className="w-full bg-black text-white font-medium py-2.5 rounded-md hover:bg-gray-800 transition-colors disabled:opacity-50">
               {loading ? t("creatingAccount") : t("signUp")}
             </button>
+            <p className="text-xs text-gray-500 text-center">
+              {tf("agreeToTerms")}{" "}
+              <Link href="/terms" className="underline hover:text-gray-700">{tf("terms")}</Link>{" "}
+              {tf("and")}{" "}
+              <Link href="/privacy" className="underline hover:text-gray-700">{tf("privacy")}</Link>.
+            </p>
           </form>
           <p className="mt-5 text-sm text-center text-gray-600">
             {t("hasAccount")} <Link href="/login" className="font-medium text-gray-900 hover:underline">{t("logIn")}</Link>
