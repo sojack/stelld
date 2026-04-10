@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/routing";
 import { Footer } from "@/components/footer";
+import { GoogleButton } from "@/components/auth/google-button";
 import { LanguageSwitcher } from "@/components/language-switcher";
 
 export default function SignupPage() {
@@ -57,6 +58,12 @@ export default function SignupPage() {
         </div>
         <div className="bg-white border border-gray-200 rounded-lg p-8 shadow-sm">
           <h1 className="text-2xl font-bold text-gray-900 mb-6">{t("createAccount")}</h1>
+          <GoogleButton label={t("continueWithGoogle")} />
+          <div className="flex items-center gap-3 my-4">
+            <div className="flex-1 h-px bg-gray-200" />
+            <span className="text-xs text-gray-400">{t("or")}</span>
+            <div className="flex-1 h-px bg-gray-200" />
+          </div>
           {error && <p className="text-red-600 font-medium mb-4">{error}</p>}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>

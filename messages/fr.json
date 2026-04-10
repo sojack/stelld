@@ -69,7 +69,9 @@
     "requestNewLink": "Demander un nouveau lien",
     "passwordResetSuccess": "Votre mot de passe a été réinitialisé avec succès.",
     "loginWithNewPassword": "Connectez-vous avec votre nouveau mot de passe",
-    "accountCreated": "Compte créé — veuillez vous connecter."
+    "accountCreated": "Compte créé — veuillez vous connecter.",
+    "continueWithGoogle": "Continuer avec Google",
+    "or": "ou"
   },
   "dashboard": {
     "yourForms": "Vos formulaires",

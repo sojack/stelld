@@ -69,7 +69,9 @@
     "requestNewLink": "Request a new reset link",
     "passwordResetSuccess": "Your password has been reset successfully.",
     "loginWithNewPassword": "Log in with your new password",
-    "accountCreated": "Account created — please log in."
+    "accountCreated": "Account created — please log in.",
+    "continueWithGoogle": "Continue with Google",
+    "or": "or"
   },
   "dashboard": {
     "yourForms": "Your Forms",

@@ -7,6 +7,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { useSearchParams } from "next/navigation";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { GoogleButton } from "@/components/auth/google-button";
 
 export default function LoginPage() {
   const t = useTranslations("auth");
@@ -52,6 +53,12 @@ export default function LoginPage() {
         </div>
         <div className="bg-white border border-gray-200 rounded-lg p-8 shadow-sm">
           <h1 className="text-2xl font-bold text-gray-900 mb-6">{t("logIn")}</h1>
+          <GoogleButton label={t("continueWithGoogle")} />
+          <div className="flex items-center gap-3 my-4">
+            <div className="flex-1 h-px bg-gray-200" />
+            <span className="text-xs text-gray-400">{t("or")}</span>
+            <div className="flex-1 h-px bg-gray-200" />
+          </div>
           {registered && (
             <p className="text-green-700 bg-green-50 border border-green-200 rounded-md px-4 py-2 font-medium mb-4">
               {t("accountCreated")}
