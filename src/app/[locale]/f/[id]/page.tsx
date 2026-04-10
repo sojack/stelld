@@ -2,7 +2,6 @@ import { prisma } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { redirect } from "next/navigation";
 import { FormRenderer } from "@/components/form-renderer";
-import { Footer } from "@/components/footer";
 
 export default async function PublicFormPage({
   params,
@@ -33,19 +32,14 @@ export default async function PublicFormPage({
   const settings = form.settings as { thankYouMessage?: string; bannerUrl?: string };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <div className="flex-1">
-        <FormRenderer
-          formId={form.id}
-          schema={form.schema as object}
-          title={form.title}
-          description={form.description ?? ""}
-          thankYouMessage={settings.thankYouMessage}
-          bannerUrl={settings.bannerUrl}
-          locale={locale}
-        />
-      </div>
-      <Footer />
-    </div>
+    <FormRenderer
+      formId={form.id}
+      schema={form.schema as object}
+      title={form.title}
+      description={form.description ?? ""}
+      thankYouMessage={settings.thankYouMessage}
+      bannerUrl={settings.bannerUrl}
+      locale={locale}
+    />
   );
 }
