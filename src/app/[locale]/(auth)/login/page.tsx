@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { signIn } from "next-auth/react";
 import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/routing";
@@ -43,8 +44,10 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-6">
       <div className="w-full max-w-md">
-        <div className="text-center mb-8 flex items-center justify-center gap-4">
-          <Link href="/" className="text-xl font-bold text-gray-900">{tc("stelld")}</Link>
+        <div className="flex flex-col items-center gap-3 mb-8">
+          <Link href="/">
+            <Image src="/logo/logo-light.svg" alt="Stelld" width={160} height={40} priority />
+          </Link>
           <LanguageSwitcher />
         </div>
         <div className="bg-white border border-gray-200 rounded-lg p-8 shadow-sm">
