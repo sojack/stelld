@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import Image from "next/image";
 import { Link } from "@/i18n/routing";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { Footer } from "@/components/footer";
@@ -17,6 +18,9 @@ export default async function HomePage() {
       {/* Hero */}
       <section className="flex-1 flex items-center justify-center px-6">
         <div className="text-center max-w-2xl">
+          <div className="flex justify-center mb-6">
+            <Image src="/logo/logo-light.svg" alt="Stelld" width={200} height={50} priority />
+          </div>
           <h1 className="text-5xl font-bold text-gray-900 leading-tight tracking-tight">
             {t("heroTitle1")}
             <br />

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 
@@ -10,7 +11,9 @@ export function Footer() {
   return (
     <footer className="border-t border-gray-200 bg-white px-6 py-6">
       <div className="max-w-4xl mx-auto text-center space-y-2">
-        <Link href="/" className="font-semibold text-gray-900 hover:underline">{tc("stelld")}</Link>
+        <Link href="/" className="inline-flex justify-center">
+          <Image src="/logo/icon-light.svg" alt="Stelld" width={28} height={28} />
+        </Link>
         <p className="text-sm text-gray-500">{tc("builtInCanada")}</p>
         <div className="flex items-center justify-center gap-4 text-xs text-gray-400">
           <Link href="/terms" className="hover:text-gray-600 hover:underline">{tf("terms")}</Link>
