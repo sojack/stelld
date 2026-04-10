@@ -23,13 +23,23 @@ export default async function PublicFormPage({
 
     if (!form) notFound();
 
-    // If accessed by UUID but form has a slug, redirect permanently
+    // If accessed by UUID but form has a slug, redirect to slug URL
     if (form.slug) {
       redirect(`/${locale}/f/${form.slug}`);
     }
   }
 
-  const settings = form.settings as { thankYouMessage?: string; bannerUrl?: string };
+  const settings = form.settings as {
+    thankYouMessage?: string;
+    bannerUrl?: string;
+    footerText?: string;
+    footerLink?: string;
+  };
+
+  const subscription = await prisma.subscription.findUnique({
+    where: { userId: form.userId },
+  });
+  const isPaid = subscription?.plan === "PRO" || subscription?.plan === "BUSINESS";
 
   return (
     <FormRenderer
@@ -39,6 +49,9 @@ export default async function PublicFormPage({
       description={form.description ?? ""}
       thankYouMessage={settings.thankYouMessage}
       bannerUrl={settings.bannerUrl}
+      footerText={settings.footerText}
+      footerLink={settings.footerLink}
+      isPaid={isPaid}
       locale={locale}
     />
   );

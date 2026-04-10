@@ -139,7 +139,12 @@
     "businessOnly": "Business plan",
     "paymentAmount": "Amount",
     "paymentCurrency": "Currency",
-    "paymentDescription": "Payment description"
+    "paymentDescription": "Payment description",
+    "formFooter": "Form footer",
+    "formFooterTextPlaceholder": "e.g. Powered by Acme Corp",
+    "formFooterLinkPlaceholder": "https://yourwebsite.com (optional)",
+    "availableOnPro": "Available on",
+    "proPlan": "PRO plan"
   },
   "renderer": {
     "thankYou": "Thank you!",

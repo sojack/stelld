@@ -6,7 +6,6 @@ import { Survey } from "survey-react-ui";
 import { useTranslations } from "next-intl";
 import "survey-core/survey-core.min.css";
 import "./form-renderer.css";
-import { Footer } from "./footer";
 import { LanguageSwitcher } from "./language-switcher";
 
 interface FormRendererProps {
@@ -16,6 +15,9 @@ interface FormRendererProps {
   description?: string;
   thankYouMessage?: string;
   bannerUrl?: string;
+  footerText?: string;
+  footerLink?: string;
+  isPaid?: boolean;
   locale: string;
 }
 
@@ -43,7 +45,7 @@ const THEME_OVERRIDES = {
   },
 };
 
-export function FormRenderer({ formId, schema, title, description, thankYouMessage, bannerUrl, locale }: FormRendererProps) {
+export function FormRenderer({ formId, schema, title, description, thankYouMessage, bannerUrl, footerText, footerLink, isPaid, locale }: FormRendererProps) {
   const t = useTranslations("renderer");
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
@@ -186,7 +188,25 @@ export function FormRenderer({ formId, schema, title, description, thankYouMessa
         )}
         <Survey model={survey} />
       </div>
-      <Footer />
+      {isPaid ? (
+        <footer className="border-t border-gray-100 py-6 px-6 text-center space-y-2">
+          {footerText && (
+            <p className="text-sm font-medium text-gray-700">
+              {footerLink ? (
+                <a href={footerLink} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                  {footerText}
+                </a>
+              ) : footerText}
+            </p>
+          )}
+          <p className="text-xs text-gray-300">Stelld &mdash; Canadian form builder</p>
+        </footer>
+      ) : (
+        <footer className="border-t border-gray-200 py-8 px-6 text-center">
+          <p className="text-base font-semibold text-gray-700">Stelld</p>
+          <p className="text-sm text-gray-500 mt-1">Canadian form builder</p>
+        </footer>
+      )}
     </div>
   );
 }

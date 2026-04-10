@@ -139,7 +139,12 @@
     "businessOnly": "Forfait Affaires",
     "paymentAmount": "Montant",
     "paymentCurrency": "Devise",
-    "paymentDescription": "Description du paiement"
+    "paymentDescription": "Description du paiement",
+    "formFooter": "Pied de formulaire",
+    "formFooterTextPlaceholder": "ex. Propulsé par Acme Corp",
+    "formFooterLinkPlaceholder": "https://votresite.com (optionnel)",
+    "availableOnPro": "Disponible sur le",
+    "proPlan": "forfait PRO"
   },
   "renderer": {
     "thankYou": "Merci!",

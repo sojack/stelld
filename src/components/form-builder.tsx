@@ -25,7 +25,7 @@ import { BannerUploader } from "./builder/banner-uploader";
 import { SlugInput } from "./builder/slug-input";
 import type { FormField } from "./builder/types";
 
-type FormSettings = { bannerUrl?: string; thankYouMessage?: string };
+type FormSettings = { bannerUrl?: string; thankYouMessage?: string; footerText?: string; footerLink?: string };
 
 interface FormBuilderProps {
   formId: string;
@@ -359,6 +359,55 @@ export function FormBuilder({ formId, initialSchema, initialTitle, initialDescri
                   onSlugChange={(newSlug) => setSlug(newSlug ?? undefined)}
                   locale={locale}
                 />
+                {(plan === "PRO" || plan === "BUSINESS") ? (
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-900">{t("formFooter")}</label>
+                    <input
+                      type="text"
+                      placeholder={t("formFooterTextPlaceholder")}
+                      value={settings.footerText ?? ""}
+                      onChange={(e) => {
+                        const next: FormSettings = { ...settings, footerText: e.target.value || undefined };
+                        setSettings(next);
+                      }}
+                      onBlur={(e) => {
+                        const next: FormSettings = { ...settings, footerText: e.target.value || undefined };
+                        fetch(`/api/forms/${formId}`, {
+                          method: "PUT",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ settings: next }),
+                        });
+                      }}
+                      className="w-full border border-gray-300 rounded px-3 py-1.5 text-sm text-gray-900"
+                    />
+                    <input
+                      type="url"
+                      placeholder={t("formFooterLinkPlaceholder")}
+                      value={settings.footerLink ?? ""}
+                      onChange={(e) => {
+                        const next: FormSettings = { ...settings, footerLink: e.target.value || undefined };
+                        setSettings(next);
+                      }}
+                      onBlur={(e) => {
+                        const next: FormSettings = { ...settings, footerLink: e.target.value || undefined };
+                        fetch(`/api/forms/${formId}`, {
+                          method: "PUT",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ settings: next }),
+                        });
+                      }}
+                      className="w-full border border-gray-300 rounded px-3 py-1.5 text-sm text-gray-900"
+                    />
+                  </div>
+                ) : (
+                  <div className="rounded-md border border-dashed border-gray-200 p-4 text-center">
+                    <p className="text-xs text-gray-500 mb-1">{t("formFooter")}</p>
+                    <p className="text-xs text-gray-400">
+                      {t("availableOnPro")}{" "}
+                      <a href={`/${locale}/dashboard/billing`} className="text-green-700 underline">{t("proPlan")}</a>
+                    </p>
+                  </div>
+                )}
                 <p className="text-xs text-gray-400 text-center pt-4">{t("selectFieldHint")}</p>
               </div>
             )}
