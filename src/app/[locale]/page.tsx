@@ -51,7 +51,7 @@ export default async function HomePage() {
       </section>
 
       {/* Feature Highlights */}
-      <section className="px-6 pb-16">
+      <section className="px-6 pb-16 pt-8">
         <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-white border border-gray-200 rounded-lg p-6">
             <div className="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center mb-4">

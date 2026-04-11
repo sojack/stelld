@@ -76,4 +76,4 @@ No multi-tenant RLS — queries filter by `user_id`. The JSONB `schema` column s
 
 ## Project Status
 
-Deployed to production at stelld.ca. MVP features complete, bilingual (EN/FR) complete, Stripe payments complete (subscriptions + Connect + form payment collection), banner uploads complete, custom slugs complete, Terms and Privacy pages complete, pricing section on homepage complete.
+Deployed to production at stelld.ca. MVP features complete, bilingual (EN/FR) complete, Stripe payments complete (subscriptions + Connect + form payment collection), banner uploads complete, custom slugs complete, Terms and Privacy pages complete, pricing section on homepage complete, Google OAuth sign-in complete.
