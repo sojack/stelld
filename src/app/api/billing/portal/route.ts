@@ -20,10 +20,14 @@ export async function POST(req: Request) {
   const { locale } = await req.json();
   const appUrl = process.env.NEXT_PUBLIC_APP_URL!;
 
-  const portalSession = await stripe.billingPortal.sessions.create({
-    customer: subscription.stripeCustomerId,
-    return_url: `${appUrl}/${locale || "en"}/dashboard/billing`,
-  });
-
-  return NextResponse.json({ url: portalSession.url });
+  try {
+    const portalSession = await stripe.billingPortal.sessions.create({
+      customer: subscription.stripeCustomerId,
+      return_url: `${appUrl}/${locale || "en"}/dashboard/billing`,
+    });
+    return NextResponse.json({ url: portalSession.url });
+  } catch (err) {
+    console.error("Stripe billing portal error:", err);
+    return NextResponse.json({ error: "Failed to create billing portal session" }, { status: 500 });
+  }
 }

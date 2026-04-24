@@ -29,6 +29,7 @@ export default function BillingPage() {
   const [loading, setLoading] = useState(true);
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
   const [connect, setConnect] = useState<{ connected: boolean; onboardingComplete?: boolean; payoutsEnabled?: boolean } | null>(null);
+  const [portalError, setPortalError] = useState<string | null>(null);
 
   const result = searchParams.get("result");
 
@@ -63,13 +64,22 @@ export default function BillingPage() {
   }
 
   async function handlePortal() {
-    const res = await fetch("/api/billing/portal", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ locale }),
-    });
-    const { url } = await res.json();
-    if (url) window.location.href = url;
+    setPortalError(null);
+    try {
+      const res = await fetch("/api/billing/portal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ locale }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        setPortalError(data.error ?? "Something went wrong. Please try again.");
+      }
+    } catch {
+      setPortalError("Something went wrong. Please try again.");
+    }
   }
 
   if (loading) {
@@ -96,6 +106,12 @@ export default function BillingPage() {
       {result === "canceled" && (
         <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-800 text-sm font-medium">
           {t("canceled")}
+        </div>
+      )}
+
+      {portalError && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm font-medium">
+          {portalError}
         </div>
       )}
 
