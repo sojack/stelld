@@ -20,7 +20,7 @@ export function Footer() {
           <span>·</span>
           <Link href="/privacy" className="hover:text-gray-600 hover:underline">{tf("privacy")}</Link>
         </div>
-        <p className="text-xs text-gray-400">© {new Date().getFullYear()} JS Designs. {tf("allRights")}</p>
+        <p className="text-xs text-gray-400">© {new Date().getFullYear()} <a href="https://jsdesigns.ca/" target="_blank" rel="noopener noreferrer" className="hover:text-gray-600 hover:underline">JS Designs</a>. {tf("allRights")}</p>
       </div>
     </footer>
   );
