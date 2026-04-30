@@ -5,7 +5,7 @@
 
 ## Summary
 
-Add team collaboration to Stelld so account owners can invite others as **Viewer** or **Editor** of their account. Every user keeps a personal account and can additionally be a member of any number of other accounts they were invited to. Member-count limits are enforced per plan: FREE = 1, PRO = 5, BUSINESS = unlimited. Invites are sent by email and accepted via a tokenized link that supports both signup-and-join and login-and-join in a single flow.
+Add team collaboration to Stelld so account owners can invite others as **Viewer** or **Editor** of their account. Every user keeps a personal account and can additionally be a member of **at most one other** account they were invited to. Member-count limits are enforced per plan: FREE = 1, PRO = 5, BUSINESS = unlimited. Invites are sent by email and accepted via a tokenized link that supports both signup-and-join and login-and-join in a single flow.
 
 ## Goals
 
@@ -26,7 +26,9 @@ Add team collaboration to Stelld so account owners can invite others as **Viewer
 
 ## Account Model
 
-**Hybrid:** every user always has their own personal account (one-to-one with the user). Each user can additionally be a member of any number of other accounts they were invited to. Each account has exactly one owner; ownership is permanent.
+**Hybrid:** every user always has their own personal account (one-to-one with the user). Each user can additionally be a member of at most one other account they were invited to. To accept a new invite while already a member of another account, they must first leave their current account membership. Each account has exactly one owner; ownership is permanent.
+
+This restriction is enforced at the application layer in invite acceptance: if the user is already an `AccountMember` of any other account, the acceptance handler rejects with `ALREADY_IN_OTHER_ACCOUNT` and the invite landing page shows "You're currently a member of *Other Account Name* — leave that account first to accept this invite." (Schema does not enforce this with a uniqueness constraint, so future relaxation to multi-membership stays a code-only change.)
 
 A **Form belongs to exactly one Account.** Forms are scoped to accounts, not directly to users. The user who originally created a form is preserved as `Form.userId` (createdBy), but ownership and access are determined by the form's `accountId`.
 
@@ -223,7 +225,7 @@ Wrapped in `prisma.$transaction`:
 ### Account switcher (header on all dashboard pages)
 
 - Dropdown trigger shows the active account's name with a chevron.
-- Lists user's personal account first, then any other accounts they're a member of, with role badge ("Editor" / "Viewer").
+- Lists user's personal account first, then the one other account they're a member of (if any), with role badge ("Editor" / "Viewer").
 - Selection sets the `stelld_account` cookie and reloads the dashboard.
 
 ### Forms list (`/dashboard`)
@@ -272,6 +274,7 @@ Wrapped in `prisma.$transaction`:
 
 - `MEMBER_LIMIT_REACHED` (403): UI shows upgrade prompt with current/max counts.
 - `INVITE_DUPLICATE` (409): UI offers "Resend invite."
+- `ALREADY_IN_OTHER_ACCOUNT` (409): on accept, invitee is already a member of another non-owned account. Landing page guides them to leave that one first.
 - Invite expired / invalid / already accepted: friendly error page on `/invite/[token]`.
 - Email mismatch on accept: blocked with helpful message.
 - `SELF_INVITE` (400): "You can't invite yourself."
@@ -297,6 +300,7 @@ Wrapped in `prisma.$transaction`:
 - Invite revoke: owner revokes pending invite; the email link shows "invalid/expired."
 - Email mismatch: invite to one email, log in with another, click link — blocked.
 - Idempotent acceptance: clicking the link twice quickly results in exactly one `AccountMember` row.
+- Already-in-other-account: invitee already a member of Account X clicks an invite to Account Y → blocked with helpful message; after leaving X, accepting Y succeeds.
 - Remove member: removed user no longer sees the account in their switcher; their previously-created forms remain in the account.
 - Leave account (member): account disappears from their switcher; cannot leave own account.
 
