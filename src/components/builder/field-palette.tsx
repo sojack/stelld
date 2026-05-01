@@ -13,7 +13,9 @@ export type FieldTypeId =
   | "checkbox"
   | "radio"
   | "date"
-  | "payment";
+  | "divider"
+  | "subtitle"
+  | "description";
 
 export interface FieldType {
   id: FieldTypeId;
@@ -23,6 +25,7 @@ export interface FieldType {
   inputType?: string;
   hasChoices?: boolean;
   isPayment?: boolean;
+  displayKind?: "divider" | "subtitle" | "description";
   label: string; // resolved at render time
 }
 
@@ -36,7 +39,9 @@ const FIELD_TYPE_DEFS: Omit<FieldType, "label">[] = [
   { id: "checkbox", labelKey: "fieldCheckbox", icon: "☑", surveyType: "checkbox", hasChoices: true },
   { id: "radio", labelKey: "fieldRadio", icon: "◉", surveyType: "radiogroup", hasChoices: true },
   { id: "date", labelKey: "fieldDate", icon: "📅", surveyType: "text", inputType: "date" },
-  { id: "payment", labelKey: "fieldPayment", icon: "$", surveyType: "expression", isPayment: true },
+  { id: "divider", labelKey: "fieldDivider", icon: "—", surveyType: "html", displayKind: "divider" },
+  { id: "subtitle", labelKey: "fieldSubtitle", icon: "H₂", surveyType: "html", displayKind: "subtitle" },
+  { id: "description", labelKey: "fieldDescription", icon: "¶", surveyType: "html", displayKind: "description" },
 ];
 
 // Exported for use in form-builder (addField needs label + surveyType etc.)
