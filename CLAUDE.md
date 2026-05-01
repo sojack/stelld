@@ -71,9 +71,9 @@ No multi-tenant RLS — queries filter by `user_id`. The JSONB `schema` column s
 
 1. **MVP**: Auth, form builder (SurveyJS Creator), public forms, submissions, email notifications, CSV export — **complete**
 2. **Phase 2**: File uploads (S3), bilingual FR/EN — **bilingual complete**
-3. **Phase 3**: Payments (Stripe/Helcim), subdomains, multi-user orgs — **Stripe integration complete**. Form banner upload (S3, PRO+) — **complete**. Custom form slugs (PRO+, `/f/my-slug`) — **complete**
+3. **Phase 3**: Payments (Stripe/Helcim), subdomains, multi-user orgs — **Stripe integration complete**. Form banner upload (S3, PRO+) — **complete**. Custom form slugs (PRO+, `/f/my-slug`) — **complete**. Team collaboration (Account/Member model, Viewer/Editor roles, email invites, account switcher) — **complete**
 4. **Phase 4**: Audit logs, PIPEDA "Vault" mode, per-tenant encryption. Terms of Service and Privacy Policy pages (EN + FR) — **complete**
 
 ## Project Status
 
-Deployed to production at stelld.ca. MVP features complete, bilingual (EN/FR) complete, Stripe payments complete (subscriptions + Connect + form payment collection), banner uploads complete, custom slugs complete, Terms and Privacy pages complete, pricing section on homepage complete, Google OAuth sign-in complete.
+Deployed to production at stelld.ca. MVP features complete, bilingual (EN/FR) complete, Stripe payments complete (subscriptions + Connect + form payment collection), banner uploads complete, custom slugs complete, Terms and Privacy pages complete, pricing section on homepage complete, Google OAuth sign-in complete, team collaboration complete.
