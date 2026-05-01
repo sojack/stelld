@@ -9,8 +9,8 @@ interface FormCardProps {
   isPublished: boolean;
   submissionCount: number;
   updatedAt: string;
-  onDelete: (id: string) => void;
-  onDuplicate: (id: string) => void;
+  onDelete?: (id: string) => void;
+  onDuplicate?: (id: string) => void;
 }
 
 export function FormCard({
@@ -41,18 +41,22 @@ export function FormCard({
           >
             {t("submissions")}
           </Link>
-          <button
-            onClick={() => onDuplicate(id)}
-            className="text-sm font-medium px-3 py-1.5 border rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
-          >
-            {tc("duplicate")}
-          </button>
-          <button
-            onClick={() => onDelete(id)}
-            className="text-sm font-medium px-3 py-1.5 border rounded-md text-red-600 hover:bg-red-50 transition-colors"
-          >
-            {tc("delete")}
-          </button>
+          {onDuplicate && (
+            <button
+              onClick={() => onDuplicate(id)}
+              className="text-sm font-medium px-3 py-1.5 border rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+            >
+              {tc("duplicate")}
+            </button>
+          )}
+          {onDelete && (
+            <button
+              onClick={() => onDelete(id)}
+              className="text-sm font-medium px-3 py-1.5 border rounded-md text-red-600 hover:bg-red-50 transition-colors"
+            >
+              {tc("delete")}
+            </button>
+          )}
         </div>
       </div>
     </div>

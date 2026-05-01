@@ -13,12 +13,15 @@ interface Form {
   _count: { submissions: number };
 }
 
+type Role = "OWNER" | "EDITOR" | "VIEWER";
+
 export default function DashboardPage() {
   const t = useTranslations("dashboard");
   const tc = useTranslations("common");
   const tb = useTranslations("billing");
   const router = useRouter();
   const [forms, setForms] = useState<Form[]>([]);
+  const [role, setRole] = useState<Role | null>(null);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState("");
@@ -26,14 +29,15 @@ export default function DashboardPage() {
 
   useEffect(() => {
     fetchForms();
-    fetch("/api/billing/status").then(r => r.json()).then(setBilling);
+    fetch("/api/billing/status").then(r => r.json()).then(setBilling).catch(() => {});
   }, []);
 
   async function fetchForms() {
     try {
       const res = await fetch("/api/forms");
       const data = await res.json();
-      setForms(data);
+      setForms(data.forms ?? []);
+      setRole(data.role ?? null);
     } catch {
       setError(tc("error"));
     } finally {
@@ -82,19 +86,25 @@ export default function DashboardPage() {
 
   if (loading) return <div className="py-12 text-center text-gray-600 text-lg">{tc("loading")}</div>;
 
+  const canCreate = role === "OWNER" || role === "EDITOR";
+  const canDelete = role === "OWNER";
+  const canDuplicate = role === "OWNER" || role === "EDITOR";
+
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold text-gray-900">{t("yourForms")}</h1>
-        <button
-          onClick={createForm}
-          disabled={creating}
-          className="bg-black text-white font-medium px-5 py-2.5 rounded-md hover:bg-gray-800 transition-colors disabled:opacity-50"
-        >
-          {creating ? t("creating") : t("newForm")}
-        </button>
+        {canCreate && (
+          <button
+            onClick={createForm}
+            disabled={creating}
+            className="bg-black text-white font-medium px-5 py-2.5 rounded-md hover:bg-gray-800 transition-colors disabled:opacity-50"
+          >
+            {creating ? t("creating") : t("newForm")}
+          </button>
+        )}
       </div>
-      {billing && billing.limits.maxForms < 999999 && (
+      {role === "OWNER" && billing && billing.limits.maxForms < 999999 && (
         <p className="text-sm text-gray-500 mb-4">
           {tb("formsUsed", { used: billing.usage.forms, limit: billing.limits.maxForms })}
           {billing.usage.forms >= billing.limits.maxForms && (
@@ -120,8 +130,8 @@ export default function DashboardPage() {
               isPublished={form.isPublished}
               submissionCount={form._count.submissions}
               updatedAt={form.updatedAt}
-              onDelete={deleteForm}
-              onDuplicate={duplicateForm}
+              onDelete={canDelete ? deleteForm : undefined}
+              onDuplicate={canDuplicate ? duplicateForm : undefined}
             />
           ))}
         </div>

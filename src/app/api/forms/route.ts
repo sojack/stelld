@@ -25,7 +25,7 @@ export async function GET() {
     },
   });
 
-  return NextResponse.json(forms);
+  return NextResponse.json({ forms, role: ctx.role });
 }
 
 export async function POST() {

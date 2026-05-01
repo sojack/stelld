@@ -37,6 +37,7 @@ interface FormBuilderProps {
   isPublished: boolean;
   locale: string;
   plan?: string;
+  role?: "OWNER" | "EDITOR" | "VIEWER";
 }
 
 function parseSchema(schema: object): FormField[] {
@@ -51,8 +52,10 @@ function toSurveyJson(fields: FormField[]): object {
   return { pages: [{ elements }] };
 }
 
-export function FormBuilder({ formId, initialSchema, initialTitle, initialDescription, initialSettings, initialSlug, isPublished, locale, plan }: FormBuilderProps) {
+export function FormBuilder({ formId, initialSchema, initialTitle, initialDescription, initialSettings, initialSlug, isPublished, locale, plan, role = "OWNER" }: FormBuilderProps) {
   const t = useTranslations("builder");
+  const tm = useTranslations("members");
+  const isReadOnly = role === "VIEWER";
   const [title, setTitle] = useState(initialTitle);
   const [description, setDescription] = useState(initialDescription);
   const [published, setPublished] = useState(isPublished);
@@ -75,13 +78,14 @@ export function FormBuilder({ formId, initialSchema, initialTitle, initialDescri
 
   const selectedField = fields.find((f) => f._id === selectedId) ?? null;
 
-  // Auto-save on change (debounced 3s)
+  // Auto-save on change (debounced 3s) — disabled in read-only mode.
   const scheduleAutoSave = useCallback((updatedFields: FormField[]) => {
+    if (isReadOnly) return;
     if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
     saveTimeoutRef.current = setTimeout(() => {
       saveForm(updatedFields);
     }, 3000);
-  }, []);
+  }, [isReadOnly]);
 
   useEffect(() => {
     return () => {
@@ -90,6 +94,7 @@ export function FormBuilder({ formId, initialSchema, initialTitle, initialDescri
   }, []);
 
   const saveForm = useCallback(async (updatedFields?: FormField[]) => {
+    if (isReadOnly) return;
     setSaving(true);
     setSaveError(false);
     const schema = toSurveyJson(updatedFields ?? fields);
@@ -108,9 +113,10 @@ export function FormBuilder({ formId, initialSchema, initialTitle, initialDescri
       setSaveError(true);
     }
     setSaving(false);
-  }, [formId, title, description, fields]);
+  }, [formId, title, description, fields, isReadOnly]);
 
   function updateFields(newFields: FormField[]) {
+    if (isReadOnly) return;
     setFields(newFields);
     scheduleAutoSave(newFields);
   }
@@ -148,10 +154,12 @@ export function FormBuilder({ formId, initialSchema, initialTitle, initialDescri
   }
 
   function handleDragStart(event: DragStartEvent) {
+    if (isReadOnly) return;
     setActiveId(event.active.id as string);
   }
 
   function handleDragEnd(event: DragEndEvent) {
+    if (isReadOnly) return;
     setActiveId(null);
     const { active, over } = event;
 
@@ -173,6 +181,7 @@ export function FormBuilder({ formId, initialSchema, initialTitle, initialDescri
   }
 
   async function togglePublish() {
+    if (isReadOnly) return;
     const newState = !published;
     if (newState && fields.length === 0) {
       setPublishError(t("emptyFormError"));
@@ -206,9 +215,15 @@ export function FormBuilder({ formId, initialSchema, initialTitle, initialDescri
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             onBlur={() => saveForm()}
+            readOnly={isReadOnly}
             maxLength={200}
-            className="font-semibold text-lg text-gray-900 border-none outline-none focus:ring-1 focus:ring-gray-300 rounded px-2 py-1"
+            className="font-semibold text-lg text-gray-900 border-none outline-none focus:ring-1 focus:ring-gray-300 rounded px-2 py-1 read-only:bg-transparent read-only:cursor-default"
           />
+          {isReadOnly && (
+            <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-2 py-1 rounded">
+              {tm("readOnlyBadge")}
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-4">
           <span className="text-sm">
@@ -240,16 +255,18 @@ export function FormBuilder({ formId, initialSchema, initialTitle, initialDescri
               </button>
             </>
           )}
-          <button
-            onClick={togglePublish}
-            className={`text-sm font-medium px-5 py-2 rounded-md transition-colors ${
-              published
-                ? "bg-gray-200 text-gray-800 hover:bg-gray-300"
-                : "bg-green-600 text-white hover:bg-green-700"
-            }`}
-          >
-            {published ? t("unpublish") : t("publish")}
-          </button>
+          {!isReadOnly && (
+            <button
+              onClick={togglePublish}
+              className={`text-sm font-medium px-5 py-2 rounded-md transition-colors ${
+                published
+                  ? "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                  : "bg-green-600 text-white hover:bg-green-700"
+              }`}
+            >
+              {published ? t("unpublish") : t("publish")}
+            </button>
+          )}
         </div>
       </div>
 
@@ -261,11 +278,13 @@ export function FormBuilder({ formId, initialSchema, initialTitle, initialDescri
         onDragEnd={handleDragEnd}
       >
         <div className="flex-1 flex overflow-hidden">
-          {/* Left: Field Palette */}
-          <div className="w-[200px] bg-white border-r p-3 overflow-y-auto">
-            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">{t("fields")}</h3>
-            <FieldPalette onAddField={addField} plan={plan} />
-          </div>
+          {/* Left: Field Palette — hidden in read-only mode */}
+          {!isReadOnly && (
+            <div className="w-[200px] bg-white border-r p-3 overflow-y-auto">
+              <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">{t("fields")}</h3>
+              <FieldPalette onAddField={addField} plan={plan} />
+            </div>
+          )}
 
           {/* Center: Canvas */}
           <div
@@ -285,9 +304,10 @@ export function FormBuilder({ formId, initialSchema, initialTitle, initialDescri
                     scheduleAutoSave(fields);
                   }}
                   onBlur={() => saveForm()}
+                  readOnly={isReadOnly}
                   maxLength={200}
                   placeholder={t("label")}
-                  className="w-full text-2xl font-bold text-gray-900 border-none outline-none placeholder-gray-300 mb-2"
+                  className="w-full text-2xl font-bold text-gray-900 border-none outline-none placeholder-gray-300 mb-2 read-only:cursor-default"
                 />
                 <textarea
                   value={description}
@@ -296,6 +316,7 @@ export function FormBuilder({ formId, initialSchema, initialTitle, initialDescri
                     scheduleAutoSave(fields);
                   }}
                   onBlur={() => saveForm()}
+                  readOnly={isReadOnly}
                   rows={2}
                   placeholder={t("descriptionPlaceholder")}
                   className="w-full text-sm text-gray-600 border-none outline-none placeholder-gray-300 resize-none"
@@ -319,7 +340,7 @@ export function FormBuilder({ formId, initialSchema, initialTitle, initialDescri
                         field={field}
                         isSelected={selectedId === field._id}
                         onSelect={() => setSelectedId(field._id)}
-                        onDelete={() => deleteField(field._id)}
+                        onDelete={isReadOnly ? () => {} : () => deleteField(field._id)}
                       />
                     ))}
                   </div>
@@ -328,8 +349,8 @@ export function FormBuilder({ formId, initialSchema, initialTitle, initialDescri
             </div>
           </div>
 
-          {/* Right: Property Editor */}
-          <div className="w-[280px] bg-white border-l p-4 overflow-y-auto">
+          {/* Right: Property Editor — hidden in read-only mode */}
+          {!isReadOnly && <div className="w-[280px] bg-white border-l p-4 overflow-y-auto">
             {selectedField ? (
               <PropertyEditor
                 field={selectedField}
@@ -411,7 +432,7 @@ export function FormBuilder({ formId, initialSchema, initialTitle, initialDescri
                 <p className="text-xs text-gray-400 text-center pt-4">{t("selectFieldHint")}</p>
               </div>
             )}
-          </div>
+          </div>}
         </div>
 
         <DragOverlay>
