@@ -1,11 +1,12 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { NextResponse } from "next/server";
+import { getFormAccess, can } from "@/lib/access";
 import { getPlanLimits } from "@/lib/plans";
 import { validateSlug } from "@/lib/slug";
+import { NextResponse } from "next/server";
 
 export async function GET(
-  req: Request,
+  _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
@@ -14,15 +15,12 @@ export async function GET(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const form = await prisma.form.findFirst({
-    where: { id, userId: session.user.id },
-  });
-
-  if (!form) {
+  const access = await getFormAccess(session.user.id, id);
+  if (!access || !can(access.role, "VIEW_FORM")) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  return NextResponse.json(form);
+  return NextResponse.json({ ...access.form, _role: access.role });
 }
 
 export async function PUT(
@@ -35,24 +33,31 @@ export async function PUT(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const access = await getFormAccess(session.user.id, id);
+  if (!access) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+  if (!can(access.role, "EDIT_FORM")) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
   const body = await req.json();
 
-  // Handle slug update
   if (body.slug !== undefined) {
+    const account = await prisma.appAccount.findUnique({
+      where: { id: access.form.accountId },
+      select: { ownerId: true },
+    });
     const subscription = await prisma.subscription.findUnique({
-      where: { userId: session.user.id },
+      where: { userId: account!.ownerId },
     });
     const limits = getPlanLimits(subscription?.plan);
     if (!limits.canCustomizeSlug) {
       return NextResponse.json({ error: "Upgrade to PRO to use custom URLs" }, { status: 403 });
     }
 
-    // null or empty string clears the slug
     if (body.slug === null || body.slug === "") {
-      await prisma.form.updateMany({
-        where: { id, userId: session.user.id },
-        data: { slug: null },
-      });
+      await prisma.form.update({ where: { id }, data: { slug: null } });
       return NextResponse.json({ success: true });
     }
 
@@ -61,7 +66,6 @@ export async function PUT(
       return NextResponse.json({ error: validationError }, { status: 400 });
     }
 
-    // Check uniqueness excluding this form
     const existing = await prisma.form.findFirst({
       where: { slug: body.slug, NOT: { id } },
     });
@@ -69,16 +73,12 @@ export async function PUT(
       return NextResponse.json({ error: "This URL is already taken" }, { status: 409 });
     }
 
-    await prisma.form.updateMany({
-      where: { id, userId: session.user.id },
-      data: { slug: body.slug },
-    });
+    await prisma.form.update({ where: { id }, data: { slug: body.slug } });
     return NextResponse.json({ success: true });
   }
 
-  // Existing non-slug fields
-  const form = await prisma.form.updateMany({
-    where: { id, userId: session.user.id },
+  await prisma.form.update({
+    where: { id },
     data: {
       ...(body.title !== undefined && { title: body.title }),
       ...(body.schema !== undefined && { schema: body.schema }),
@@ -88,15 +88,11 @@ export async function PUT(
     },
   });
 
-  if (form.count === 0) {
-    return NextResponse.json({ error: "Not found" }, { status: 404 });
-  }
-
   return NextResponse.json({ success: true });
 }
 
 export async function DELETE(
-  req: Request,
+  _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
@@ -105,9 +101,14 @@ export async function DELETE(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  await prisma.form.deleteMany({
-    where: { id, userId: session.user.id },
-  });
+  const access = await getFormAccess(session.user.id, id);
+  if (!access) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+  if (!can(access.role, "DELETE_FORM")) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
 
+  await prisma.form.delete({ where: { id } });
   return NextResponse.json({ success: true });
 }

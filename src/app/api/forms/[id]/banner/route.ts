@@ -1,10 +1,11 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { getFormAccess, can } from "@/lib/access";
 import { NextResponse } from "next/server";
 import { getBannerUploadUrl, deleteBannerObject } from "@/lib/s3";
 import { getPlanLimits } from "@/lib/plans";
 
-const MAX_BANNER_BYTES = 5 * 1024 * 1024; // 5 MB
+const MAX_BANNER_BYTES = 5 * 1024 * 1024;
 
 export async function POST(
   req: Request,
@@ -16,15 +17,17 @@ export async function POST(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const form = await prisma.form.findFirst({
-    where: { id, userId: session.user.id },
-  });
-  if (!form) {
-    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  const access = await getFormAccess(session.user.id, id);
+  if (!access || !can(access.role, "EDIT_FORM")) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
+  const account = await prisma.appAccount.findUnique({
+    where: { id: access.form.accountId },
+    select: { ownerId: true },
+  });
   const subscription = await prisma.subscription.findUnique({
-    where: { userId: session.user.id },
+    where: { userId: account!.ownerId },
   });
   const limits = getPlanLimits(subscription?.plan);
   if (!limits.canUploadBanner) {
@@ -55,28 +58,25 @@ export async function DELETE(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const form = await prisma.form.findFirst({
-    where: { id, userId: session.user.id },
-  });
-  if (!form) {
-    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  const access = await getFormAccess(session.user.id, id);
+  if (!access || !can(access.role, "EDIT_FORM")) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const settings = form.settings as { bannerUrl?: string };
+  const settings = access.form.settings as { bannerUrl?: string };
   if (settings.bannerUrl) {
-    // Extract S3 key from URL: https://bucket.s3.region.amazonaws.com/key
     try {
       const url = new URL(settings.bannerUrl);
-      const key = url.pathname.slice(1); // strip leading /
+      const key = url.pathname.slice(1);
       await deleteBannerObject(key);
     } catch {
-      // If deletion from S3 fails, still clear the URL from settings
+      // ignore S3 deletion failure; still clear setting
     }
   }
 
   const newSettings = { ...settings, bannerUrl: undefined };
-  await prisma.form.updateMany({
-    where: { id, userId: session.user.id },
+  await prisma.form.update({
+    where: { id },
     data: { settings: newSettings },
   });
 
