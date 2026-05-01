@@ -14,4 +14,11 @@ export interface FormField {
   paymentAmount?: number;
   paymentCurrency?: "CAD" | "USD";
   paymentDescription?: string;
+
+  // Non-input display element discriminator. When set, this field renders
+  // as a divider, subtitle, or description in the builder, and serializes
+  // to a SurveyJS `type: "html"` element with synthesized html content.
+  displayKind?: "divider" | "subtitle" | "description";
+  subtitleText?: LocalizedString;
+  descriptionText?: LocalizedString;
 }
