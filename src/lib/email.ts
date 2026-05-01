@@ -49,6 +49,55 @@ export async function sendPasswordResetEmail(toEmail: string, token: string) {
   }
 }
 
+export async function sendInviteEmail(opts: {
+  toEmail: string;
+  accountName: string;
+  inviterName: string;
+  role: "VIEWER" | "EDITOR";
+  token: string;
+}) {
+  const { toEmail, accountName, inviterName, role, token } = opts;
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  const inviteLinkEn = `${appUrl}/en/invite/${token}`;
+  const inviteLinkFr = `${appUrl}/fr/invite/${token}`;
+  const safeAccount = escapeHtml(accountName);
+  const safeInviter = escapeHtml(inviterName);
+  const roleEn = role === "EDITOR" ? "Editor" : "Viewer";
+  const roleFr = role === "EDITOR" ? "Éditeur" : "Lecteur";
+
+  try {
+    await ses.send(
+      new SendEmailCommand({
+        Source: fromEmail,
+        Destination: { ToAddresses: [toEmail] },
+        Message: {
+          Subject: {
+            Data: `${inviterName} invited you to ${accountName} on Stelld / ${inviterName} vous a invité sur Stelld`,
+          },
+          Body: {
+            Html: {
+              Data: `
+                <p><strong>${safeInviter}</strong> has invited you to join <strong>${safeAccount}</strong> on Stelld as a <strong>${roleEn}</strong>.</p>
+                <p><a href="${inviteLinkEn}">Accept invitation</a></p>
+                <p style="color:#666;font-size:12px;">This invite expires in 7 days. If you weren't expecting this, you can ignore this email.</p>
+                <hr style="margin: 24px 0; border: none; border-top: 1px solid #e5e7eb;" />
+                <p><strong>${safeInviter}</strong> vous a invité à rejoindre <strong>${safeAccount}</strong> sur Stelld en tant que <strong>${roleFr}</strong>.</p>
+                <p><a href="${inviteLinkFr}">Accepter l'invitation</a></p>
+                <p style="color:#666;font-size:12px;">Cette invitation expire dans 7 jours. Si vous n'attendiez pas cette invitation, vous pouvez ignorer ce courriel.</p>
+              `,
+            },
+            Text: {
+              Data: `${inviterName} invited you to join ${accountName} on Stelld as a ${roleEn}.\n\nAccept: ${inviteLinkEn}\n\nThis invite expires in 7 days.\n\n---\n\n${inviterName} vous a invité à rejoindre ${accountName} sur Stelld en tant que ${roleFr}.\n\nAccepter : ${inviteLinkFr}\n\nCette invitation expire dans 7 jours.`,
+            },
+          },
+        },
+      })
+    );
+  } catch (error) {
+    console.error("Failed to send invite email:", error);
+  }
+}
+
 export async function sendSubmissionNotification(
   toEmail: string,
   formTitle: string,
