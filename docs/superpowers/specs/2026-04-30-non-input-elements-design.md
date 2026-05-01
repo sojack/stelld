@@ -176,23 +176,35 @@ if (field.displayKind === "divider") {
 
 if (field.displayKind === "subtitle") {
   // Subtitle text + French translation; no Required, no Placeholder, no Field name, no Choices
+  const enText = getDefaultString(field.subtitleText);
+  const frText = getFrenchString(field.subtitleText);
   return (
     <div className="space-y-4">
       <h3 className="text-xs font-semibold text-gray-500 uppercase">{t("properties")}</h3>
-      <Field label={t("subtitleText")}
-             value={getDefaultString(field.subtitleText)}
-             onChange={(v) => onChange({ subtitleText: setFrenchString(field.subtitleText, getFrenchString(field.subtitleText)).default ? { default: v, fr: getFrenchString(field.subtitleText) } : v })} />
-      <hr className="my-2 border-gray-200" />
-      <h3 className="text-xs font-semibold text-gray-500 uppercase">{t("translations")}</h3>
-      <Field label={t("frenchSubtitle")}
-             value={getFrenchString(field.subtitleText)}
-             onChange={(v) => onChange({ subtitleText: setFrenchString(field.subtitleText, v) })} />
+      <label className="block">
+        <span className="block text-sm font-medium text-gray-900 mb-1">{t("subtitleText")}</span>
+        <input type="text" value={enText}
+               onChange={(e) => onChange({ subtitleText: frText ? { default: e.target.value, fr: frText } : e.target.value })}
+               className="w-full border rounded px-3 py-1.5 text-sm text-gray-900" />
+      </label>
+      <div className="border-t pt-4">
+        <h3 className="text-xs font-semibold text-gray-500 uppercase mb-3">{t("translations")}</h3>
+        <label className="block">
+          <span className="block text-sm font-medium text-gray-900 mb-1">{t("frenchSubtitle")}</span>
+          <input type="text" value={frText}
+                 onChange={(e) => onChange({ subtitleText: setFrenchString(field.subtitleText, e.target.value) as unknown as LocalizedString })}
+                 placeholder={enText}
+                 className="w-full border rounded px-3 py-1.5 text-sm text-gray-900" />
+        </label>
+      </div>
     </div>
   );
 }
 
 if (field.displayKind === "description") {
-  // Same shape as subtitle but with a textarea and "frenchDescription" key.
+  // Same shape as subtitle but with a <textarea rows={3}> instead of <input>, the
+  // "descriptionText"/"frenchDescription" i18n keys, and `descriptionText` as the
+  // FormField property being read/written.
 }
 ```
 
