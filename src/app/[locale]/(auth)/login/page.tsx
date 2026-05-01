@@ -15,6 +15,7 @@ export default function LoginPage() {
   const locale = useLocale();
   const searchParams = useSearchParams();
   const registered = searchParams.get("registered") === "true";
+  const inviteToken = searchParams.get("invite");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -34,7 +35,9 @@ export default function LoginPage() {
     const session = await sessionRes.json();
 
     if (session?.user) {
-      window.location.href = `/${locale}/dashboard`;
+      window.location.href = inviteToken
+        ? `/${locale}/invite/${inviteToken}`
+        : `/${locale}/dashboard`;
       return;
     }
 

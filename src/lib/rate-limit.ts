@@ -15,3 +15,6 @@ export function createRateLimiter(limit: number, windowMs: number) {
     return entry.count > limit;
   };
 }
+
+export const inviteSendLimiter = createRateLimiter(10, 60 * 60 * 1000);
+export const inviteLookupLimiter = createRateLimiter(20, 60 * 60 * 1000);

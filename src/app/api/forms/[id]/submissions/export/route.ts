@@ -1,9 +1,10 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { getFormAccess, can } from "@/lib/access";
 import { NextResponse } from "next/server";
 
 export async function GET(
-  req: Request,
+  _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
@@ -12,11 +13,8 @@ export async function GET(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const form = await prisma.form.findFirst({
-    where: { id, userId: session.user.id },
-  });
-
-  if (!form) {
+  const access = await getFormAccess(session.user.id, id);
+  if (!access || !can(access.role, "EXPORT_SUBMISSIONS")) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
@@ -25,7 +23,6 @@ export async function GET(
     orderBy: { createdAt: "desc" },
   });
 
-  // Collect all unique keys across submissions
   const allKeys = new Set<string>();
   for (const sub of submissions) {
     const data = sub.data as Record<string, unknown>;
@@ -55,7 +52,7 @@ export async function GET(
   }
 
   const csv = rows.join("\n");
-  const filename = `${form.title.replace(/[^a-zA-Z0-9]/g, "_")}_submissions.csv`;
+  const filename = `${access.form.title.replace(/[^a-zA-Z0-9]/g, "_")}_submissions.csv`;
 
   return new NextResponse(csv, {
     headers: {

@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { getFormAccess, can } from "@/lib/access";
 import { NextResponse } from "next/server";
 import { validateSlug } from "@/lib/slug";
 
@@ -13,10 +14,8 @@ export async function GET(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const form = await prisma.form.findFirst({
-    where: { id, userId: session.user.id },
-  });
-  if (!form) {
+  const access = await getFormAccess(session.user.id, id);
+  if (!access || !can(access.role, "EDIT_FORM")) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 

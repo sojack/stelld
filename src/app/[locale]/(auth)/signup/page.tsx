@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/routing";
+import { useSearchParams } from "next/navigation";
 import { Footer } from "@/components/footer";
 import { GoogleButton } from "@/components/auth/google-button";
 import { LanguageSwitcher } from "@/components/language-switcher";
@@ -13,6 +14,9 @@ export default function SignupPage() {
   const tc = useTranslations("common");
   const tf = useTranslations("footer");
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const inviteToken = searchParams.get("invite");
+  const prefilledEmail = searchParams.get("email") ?? "";
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -44,7 +48,11 @@ export default function SignupPage() {
       return;
     }
 
-    router.push("/login?registered=true");
+    if (inviteToken) {
+      router.push({ pathname: "/login", query: { registered: "true", invite: inviteToken } });
+    } else {
+      router.push("/login?registered=true");
+    }
   }
 
   return (
@@ -72,7 +80,15 @@ export default function SignupPage() {
             </div>
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">{tc("email")}</label>
-              <input id="email" name="email" type="email" required className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-green-600" />
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                defaultValue={prefilledEmail}
+                readOnly={!!inviteToken && !!prefilledEmail}
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-green-600 read-only:bg-gray-50 read-only:cursor-not-allowed"
+              />
             </div>
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">{tc("password")}</label>

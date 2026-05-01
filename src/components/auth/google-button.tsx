@@ -2,6 +2,7 @@
 
 import { signIn } from "next-auth/react";
 import { useLocale } from "next-intl";
+import { useSearchParams } from "next/navigation";
 
 interface GoogleButtonProps {
   label: string;
@@ -9,11 +10,16 @@ interface GoogleButtonProps {
 
 export function GoogleButton({ label }: GoogleButtonProps) {
   const locale = useLocale();
+  const searchParams = useSearchParams();
+  const inviteToken = searchParams.get("invite");
+  const callbackUrl = inviteToken
+    ? `/${locale}/invite/${inviteToken}`
+    : `/${locale}/dashboard`;
 
   return (
     <button
       type="button"
-      onClick={() => signIn("google", { callbackUrl: `/${locale}/dashboard` })}
+      onClick={() => signIn("google", { callbackUrl })}
       className="w-full flex items-center justify-center gap-3 border border-gray-300 rounded-md px-4 py-2.5 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
     >
       <GoogleIcon />

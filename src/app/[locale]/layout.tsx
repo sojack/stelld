@@ -5,6 +5,7 @@ import { getMessages, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import Script from "next/script";
 import { routing } from "@/i18n/routing";
+import { Providers } from "@/components/providers";
 import "../globals.css";
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
@@ -54,7 +55,7 @@ export default async function LocaleLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <NextIntlClientProvider messages={messages}>
-          {children}
+          <Providers>{children}</Providers>
         </NextIntlClientProvider>
         {GA_ID && (
           <>

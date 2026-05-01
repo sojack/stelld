@@ -1,9 +1,10 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { getFormAccess, can } from "@/lib/access";
 import { NextResponse } from "next/server";
 
 export async function GET(
-  req: Request,
+  _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
@@ -12,12 +13,8 @@ export async function GET(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // Verify form belongs to user
-  const form = await prisma.form.findFirst({
-    where: { id, userId: session.user.id },
-  });
-
-  if (!form) {
+  const access = await getFormAccess(session.user.id, id);
+  if (!access || !can(access.role, "VIEW_SUBMISSIONS")) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
@@ -26,5 +23,5 @@ export async function GET(
     orderBy: { createdAt: "desc" },
   });
 
-  return NextResponse.json({ form, submissions });
+  return NextResponse.json({ form: access.form, submissions, role: access.role });
 }

@@ -36,7 +36,11 @@ export async function POST(req: Request) {
 
   const form = await prisma.form.findFirst({
     where: { id: formId, isPublished: true },
-    include: { user: { select: { email: true, name: true } } },
+    include: {
+      account: {
+        include: { owner: { select: { email: true, name: true } } },
+      },
+    },
   });
 
   if (!form) {
@@ -44,7 +48,7 @@ export async function POST(req: Request) {
   }
 
   const subscription = await prisma.subscription.findUnique({
-    where: { userId: form.userId },
+    where: { userId: form.account.ownerId },
   });
   const limits = getPlanLimits(subscription?.plan);
   const now = new Date();
@@ -68,10 +72,10 @@ export async function POST(req: Request) {
     },
   });
 
-  // Send notification (fire-and-forget, don't block the response)
-  if (form.user.email) {
+  // Send notification to account owner (fire-and-forget)
+  if (form.account.owner.email) {
     sendSubmissionNotification(
-      form.user.email,
+      form.account.owner.email,
       form.title,
       form.id,
       submission.id
