@@ -74,6 +74,112 @@ export function CanvasField({ field, isSelected, onSelect, onDelete }: CanvasFie
     transition,
   };
 
+  const wrapperClass = `bg-white rounded-lg border-2 cursor-pointer transition-colors ${
+    isDragging ? "opacity-50" : ""
+  } ${isSelected ? "border-blue-500 shadow-sm" : "border-transparent hover:border-gray-300"}`;
+
+  if (field.displayKind === "divider") {
+    return (
+      <div
+        ref={setNodeRef}
+        style={style}
+        onClick={(e) => { e.stopPropagation(); onSelect(); }}
+        className={`${wrapperClass} px-4 py-3`}
+      >
+        <div className="flex items-center gap-2">
+          <span
+            {...attributes}
+            {...listeners}
+            className="cursor-grab text-gray-400 hover:text-gray-700 text-lg leading-none"
+            title={t("dragToReorder")}
+          >
+            ⠿
+          </span>
+          <hr className="flex-1 border-gray-300" />
+          {isSelected && (
+            <button
+              onClick={(e) => { e.stopPropagation(); onDelete(); }}
+              className="text-gray-400 hover:text-red-500 text-lg leading-none"
+              title={t("deleteField")}
+            >
+              &times;
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if (field.displayKind === "subtitle") {
+    const text = getDefault(field.subtitleText);
+    return (
+      <div
+        ref={setNodeRef}
+        style={style}
+        onClick={(e) => { e.stopPropagation(); onSelect(); }}
+        className={`${wrapperClass} p-4`}
+      >
+        <div className="flex items-start gap-2">
+          <span
+            {...attributes}
+            {...listeners}
+            className="cursor-grab text-gray-400 hover:text-gray-700 mt-1 text-lg leading-none"
+            title={t("dragToReorder")}
+          >
+            ⠿
+          </span>
+          <h2 className="flex-1 text-xl font-semibold text-gray-900">
+            {text || <span className="text-gray-400 italic font-normal">{t("subtitleText")}</span>}
+          </h2>
+          {isSelected && (
+            <button
+              onClick={(e) => { e.stopPropagation(); onDelete(); }}
+              className="text-gray-400 hover:text-red-500 text-lg leading-none"
+              title={t("deleteField")}
+            >
+              &times;
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if (field.displayKind === "description") {
+    const text = getDefault(field.descriptionText);
+    return (
+      <div
+        ref={setNodeRef}
+        style={style}
+        onClick={(e) => { e.stopPropagation(); onSelect(); }}
+        className={`${wrapperClass} p-4`}
+      >
+        <div className="flex items-start gap-2">
+          <span
+            {...attributes}
+            {...listeners}
+            className="cursor-grab text-gray-400 hover:text-gray-700 mt-1 text-lg leading-none"
+            title={t("dragToReorder")}
+          >
+            ⠿
+          </span>
+          <p className="flex-1 text-sm text-gray-600 whitespace-pre-line">
+            {text || <span className="text-gray-400 italic">{t("descriptionText")}</span>}
+          </p>
+          {isSelected && (
+            <button
+              onClick={(e) => { e.stopPropagation(); onDelete(); }}
+              className="text-gray-400 hover:text-red-500 text-lg leading-none"
+              title={t("deleteField")}
+            >
+              &times;
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       ref={setNodeRef}
