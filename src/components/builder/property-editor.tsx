@@ -95,6 +95,96 @@ export function PropertyEditor({ field, onChange }: PropertyEditorProps) {
     return choice.fr ?? "";
   }
 
+  if (field.displayKind === "divider") {
+    return (
+      <div className="space-y-4">
+        <h3 className="text-xs font-semibold text-gray-500 uppercase">{t("properties")}</h3>
+        <p className="text-sm text-gray-500">{t("noPropsForDivider")}</p>
+      </div>
+    );
+  }
+
+  if (field.displayKind === "subtitle") {
+    const enText = getDefaultString(field.subtitleText);
+    const frText = getFrenchString(field.subtitleText);
+    return (
+      <div className="space-y-4">
+        <h3 className="text-xs font-semibold text-gray-500 uppercase">{t("properties")}</h3>
+        <div>
+          <label className="block text-sm font-medium text-gray-900 mb-1">{t("subtitleText")}</label>
+          <input
+            ref={labelRef}
+            type="text"
+            value={enText}
+            onChange={(e) => {
+              const newVal = frText
+                ? ({ default: e.target.value, fr: frText } as unknown as string)
+                : e.target.value;
+              onChange({ subtitleText: newVal });
+            }}
+            onFocus={(e) => e.target.select()}
+            className="w-full border rounded px-3 py-1.5 text-sm text-gray-900"
+          />
+        </div>
+        <div className="border-t pt-4 mt-4">
+          <h3 className="text-xs font-semibold text-gray-500 uppercase mb-3">{t("translations")}</h3>
+          <div>
+            <label className="block text-sm font-medium text-gray-900 mb-1">{t("frenchSubtitle")}</label>
+            <input
+              type="text"
+              value={frText}
+              onChange={(e) =>
+                onChange({ subtitleText: setFrenchString(field.subtitleText, e.target.value) as unknown as string })
+              }
+              placeholder={enText}
+              className="w-full border rounded px-3 py-1.5 text-sm text-gray-900"
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (field.displayKind === "description") {
+    const enText = getDefaultString(field.descriptionText);
+    const frText = getFrenchString(field.descriptionText);
+    return (
+      <div className="space-y-4">
+        <h3 className="text-xs font-semibold text-gray-500 uppercase">{t("properties")}</h3>
+        <div>
+          <label className="block text-sm font-medium text-gray-900 mb-1">{t("descriptionText")}</label>
+          <textarea
+            rows={3}
+            value={enText}
+            onChange={(e) => {
+              const newVal = frText
+                ? ({ default: e.target.value, fr: frText } as unknown as string)
+                : e.target.value;
+              onChange({ descriptionText: newVal });
+            }}
+            onFocus={(e) => (e.target as HTMLTextAreaElement).select()}
+            className="w-full border rounded px-3 py-1.5 text-sm text-gray-900 resize-none"
+          />
+        </div>
+        <div className="border-t pt-4 mt-4">
+          <h3 className="text-xs font-semibold text-gray-500 uppercase mb-3">{t("translations")}</h3>
+          <div>
+            <label className="block text-sm font-medium text-gray-900 mb-1">{t("frenchDescription")}</label>
+            <textarea
+              rows={3}
+              value={frText}
+              onChange={(e) =>
+                onChange({ descriptionText: setFrenchString(field.descriptionText, e.target.value) as unknown as string })
+              }
+              placeholder={enText}
+              className="w-full border rounded px-3 py-1.5 text-sm text-gray-900 resize-none"
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
       <h3 className="text-xs font-semibold text-gray-500 uppercase">{t("properties")}</h3>
