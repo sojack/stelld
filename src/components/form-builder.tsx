@@ -45,9 +45,58 @@ function parseSchema(schema: object): FormField[] {
   return elements.map((el) => ({ ...el, _id: uuid() }));
 }
 
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function getLocalizedDefault(value: string | { default?: string; fr?: string } | undefined): string {
+  if (!value) return "";
+  if (typeof value === "string") return value;
+  return value.default ?? "";
+}
+
+function getLocalizedFr(value: string | { default?: string; fr?: string } | undefined): string {
+  if (!value || typeof value === "string") return "";
+  return value.fr ?? "";
+}
+
+function buildHtmlContent(field: Omit<FormField, "_id">): string | { default: string; fr: string } | undefined {
+  if (field.displayKind === "divider") {
+    return `<hr class="my-6 border-gray-200" />`;
+  }
+  if (field.displayKind === "subtitle") {
+    const en = getLocalizedDefault(field.subtitleText);
+    const frRaw = getLocalizedFr(field.subtitleText);
+    const fr = frRaw || en;
+    const wrap = (text: string) =>
+      `<h2 class="text-xl font-semibold text-gray-900 mt-6 mb-1">${escapeHtml(text)}</h2>`;
+    return en === fr ? wrap(en) : { default: wrap(en), fr: wrap(fr) };
+  }
+  if (field.displayKind === "description") {
+    const en = getLocalizedDefault(field.descriptionText);
+    const frRaw = getLocalizedFr(field.descriptionText);
+    const fr = frRaw || en;
+    const wrap = (text: string) =>
+      `<p class="text-gray-600 whitespace-pre-line mb-2">${escapeHtml(text)}</p>`;
+    return en === fr ? wrap(en) : { default: wrap(en), fr: wrap(fr) };
+  }
+  return undefined;
+}
+
 function toSurveyJson(fields: FormField[]): object {
   if (fields.length === 0) return {};
-  const elements = fields.map(({ _id, ...rest }) => rest);
+  const elements = fields.map(({ _id, ...rest }) => {
+    const html = buildHtmlContent(rest);
+    if (html !== undefined) {
+      return { ...rest, html };
+    }
+    return rest;
+  });
   return { pages: [{ elements }] };
 }
 
@@ -119,15 +168,37 @@ export function FormBuilder({ formId, initialSchema, initialTitle, initialDescri
     fieldCounter.current++;
     const fieldType = FIELD_TYPES.find((t) => t.id === typeId)!;
     const id = uuid();
+    const isDisplay =
+      typeId === "divider" || typeId === "subtitle" || typeId === "description";
+
     const newField: FormField = {
       _id: id,
       type: fieldType.surveyType,
-      name: `question${fieldCounter.current}`,
-      title: fieldType.label,
+      name: isDisplay ? `${typeId}${fieldCounter.current}` : `question${fieldCounter.current}`,
+      title: isDisplay ? "" : fieldType.label,
       isRequired: false,
       ...(fieldType.inputType && { inputType: fieldType.inputType }),
-      ...(fieldType.hasChoices && { choices: [t("defaultOption", { number: 1 }), t("defaultOption", { number: 2 }), t("defaultOption", { number: 3 })] }),
-      ...(fieldType.isPayment && { paymentAmount: 0, paymentCurrency: "CAD" as const, paymentDescription: "" }),
+      ...(fieldType.hasChoices && {
+        choices: [
+          t("defaultOption", { number: 1 }),
+          t("defaultOption", { number: 2 }),
+          t("defaultOption", { number: 3 }),
+        ],
+      }),
+      ...(fieldType.isPayment && {
+        paymentAmount: 0,
+        paymentCurrency: "CAD" as const,
+        paymentDescription: "",
+      }),
+      ...(typeId === "divider" && { displayKind: "divider" as const }),
+      ...(typeId === "subtitle" && {
+        displayKind: "subtitle" as const,
+        subtitleText: t("subtitleDefault"),
+      }),
+      ...(typeId === "description" && {
+        displayKind: "description" as const,
+        descriptionText: t("descriptionDefault"),
+      }),
     };
     const newFields = [...fields, newField];
     updateFields(newFields);
